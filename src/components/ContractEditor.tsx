@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Upload, FileText, Eye, Download, Send, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { StudentSearch } from './StudentSearch';
+import { RichTextEditor } from './RichTextEditor';
 
 interface ContractData {
   title: string;
@@ -30,10 +31,11 @@ export const ContractEditor = () => {
     content: `<h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h2>
 
 <p><strong>CONTRATANTE:</strong> [Nome da empresa/pessoa]</p>
-<p><strong>CONTRATADO:</strong> [Nome da empresa/pessoa]</p>
+<p><strong>CONTRATADO:</strong> <span class="bg-primary/10 text-primary px-2 py-1 rounded font-medium">{{NOME_RESPONSAVEL}}</span></p>
+<p><strong>ALUNO:</strong> <span class="bg-primary/10 text-primary px-2 py-1 rounded font-medium">{{NOME_ALUNO}}</span></p>
 
 <h3>CLÁUSULA 1ª - DO OBJETO</h3>
-<p>O presente contrato tem por objeto...</p>
+<p>O presente contrato tem por objeto a prestação de serviços educacionais para o aluno <span class="bg-primary/10 text-primary px-2 py-1 rounded font-medium">{{NOME_ALUNO}}</span>...</p>
 
 <h3>CLÁUSULA 2ª - DAS OBRIGAÇÕES</h3>
 <p>São obrigações do CONTRATADO:</p>
@@ -43,14 +45,14 @@ export const ContractEditor = () => {
 </ul>
 
 <h3>CLÁUSULA 3ª - DO VALOR E FORMA DE PAGAMENTO</h3>
-<p>O valor total dos serviços será de R$ _______, a ser pago...</p>
+<p>O valor total dos serviços será de R$ _______, a ser pago pelo responsável <span class="bg-primary/10 text-primary px-2 py-1 rounded font-medium">{{NOME_RESPONSAVEL}}</span>...</p>
 
 <h3>CLÁUSULA 4ª - DO PRAZO</h3>
 <p>O presente contrato terá vigência de _____ dias...</p>
 
 <p><br/>Data: ___/___/_____</p>
 <p>Assinatura do Contratante: _________________________</p>
-<p>Assinatura do Contratado: _________________________</p>`,
+<p>Assinatura do Contratado (<span class="bg-primary/10 text-primary px-2 py-1 rounded font-medium">{{NOME_RESPONSAVEL}}</span>): _________________________</p>`,
     attachments: []
   });
 
@@ -58,8 +60,8 @@ export const ContractEditor = () => {
   const [batchMode, setBatchMode] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContractData(prev => ({ ...prev, content: e.target.value }));
+  const handleContentChange = (content: string) => {
+    setContractData(prev => ({ ...prev, content }));
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,13 +199,10 @@ export const ContractEditor = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="content">Conteúdo do Contrato</Label>
-                <Textarea
-                  id="content"
+                <Label>Conteúdo do Contrato</Label>
+                <RichTextEditor 
                   value={contractData.content}
                   onChange={handleContentChange}
-                  className="min-h-[400px] font-mono text-sm transition-smooth"
-                  placeholder="Digite o conteúdo do contrato aqui..."
                 />
               </div>
 
