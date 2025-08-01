@@ -60,8 +60,8 @@ export const ContractPreview = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+      <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 p-6 pb-4 border-b">
           <DialogTitle className="text-lg font-semibold">
             Preview: {contractTitle || 'Documento'}
           </DialogTitle>
@@ -76,7 +76,7 @@ export const ContractPreview = ({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 p-6">
           <div className="space-y-8">
             {isBatchMode && selectedStudents.length > 0 ? (
               // Modo lote - mostrar um documento para cada aluno
@@ -110,7 +110,7 @@ export const ContractPreview = ({
                 </div>
               ))
             ) : (
-              // Modo individual - mostrar documento com variáveis não substituídas
+              // Mostrar documento com variáveis não substituídas quando não há alunos
               <div
                 className="prose prose-sm max-w-none bg-background p-6 rounded border"
                 dangerouslySetInnerHTML={{ __html: content }}
@@ -119,8 +119,8 @@ export const ContractPreview = ({
           </div>
         </ScrollArea>
 
-        {isBatchMode && selectedStudents.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-border">
+        {selectedStudents.length > 0 && (
+          <div className="p-6 pt-4 border-t border-border">
             <div className="text-sm text-muted-foreground text-center">
               {selectedStudents.length} documento(s) serão gerados para assinatura
             </div>

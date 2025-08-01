@@ -57,8 +57,6 @@ export const ContractEditor = () => {
     attachments: []
   });
 
-  const [showPreview, setShowPreview] = useState(false);
-  const [batchMode, setBatchMode] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -103,25 +101,16 @@ export const ContractEditor = () => {
       return;
     }
 
-    if (batchMode && selectedStudents.length === 0) {
+    if (selectedStudents.length === 0) {
       toast({
         title: "Nenhum aluno selecionado",
-        description: "Selecione pelo menos um aluno para envio em lote.",
+        description: "Selecione pelo menos um aluno para envio.",
         variant: "destructive",
       });
       return;
     }
 
-    if (!batchMode && !contractData.parties) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha as partes do contrato.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const message = batchMode 
+    const message = selectedStudents.length > 1 
       ? `Contrato enviado para ${selectedStudents.length} responsável(eis)!`
       : "Contrato enviado para assinatura eletrônica!";
 
@@ -153,54 +142,25 @@ export const ContractEditor = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Título do Contrato *</Label>
-                  <Input
-                    id="title"
-                    value={contractData.title}
-                    onChange={(e) => setContractData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Ex: Contrato de Prestação de Serviços"
-                    className="transition-smooth"
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="batch-mode"
-                    checked={batchMode}
-                    onCheckedChange={setBatchMode}
-                  />
-                  <Label htmlFor="batch-mode" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Envio em Lote
-                  </Label>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="title">Título do Contrato *</Label>
+                <Input
+                  id="title"
+                  value={contractData.title}
+                  onChange={(e) => setContractData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Ex: Contrato de Prestação de Serviços"
+                  className="transition-smooth"
+                />
               </div>
 
-              {batchMode ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Selecionar Alunos</Label>
-                    <StudentSearch
-                      selectedStudents={selectedStudents}
-                      onStudentSelect={handleStudentSelect}
-                      onStudentRemove={handleStudentRemove}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Label htmlFor="parties">Partes Envolvidas *</Label>
-                  <Input
-                    id="parties"
-                    value={contractData.parties}
-                    onChange={(e) => setContractData(prev => ({ ...prev, parties: e.target.value }))}
-                    placeholder="Ex: Empresa ABC e Cliente XYZ"
-                    className="transition-smooth"
-                  />
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label>Selecionar Alunos</Label>
+                <StudentSearch
+                  selectedStudents={selectedStudents}
+                  onStudentSelect={handleStudentSelect}
+                  onStudentRemove={handleStudentRemove}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -292,12 +252,7 @@ export const ContractEditor = () => {
                       <div>
                         <strong>Título:</strong> {contractData.title}
                       </div>
-                      {!batchMode && contractData.parties && (
-                        <div>
-                          <strong>Partes:</strong> {contractData.parties}
-                        </div>
-                      )}
-                      {batchMode && selectedStudents.length > 0 && (
+                      {selectedStudents.length > 0 && (
                         <div>
                           <strong>Alunos selecionados:</strong> {selectedStudents.length}
                         </div>
@@ -320,7 +275,7 @@ export const ContractEditor = () => {
           content={contractData.content}
           selectedStudents={selectedStudents}
           contractTitle={contractData.title}
-          isBatchMode={batchMode}
+          isBatchMode={true}
         />
       </div>
     </div>
