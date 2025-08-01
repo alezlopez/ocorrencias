@@ -3,6 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Download, X } from 'lucide-react';
+import { TimbradoA4 } from './TimbradoA4';
+import html2pdf from 'html2pdf.js';
 
 interface Student {
   codigo_aluno: number;
@@ -53,9 +55,85 @@ export const ContractPreview = ({
     return processedContent;
   };
 
-  const handleDownloadPDF = () => {
-    // TODO: Implementar geração de PDF
-    console.log('Gerar PDF para download');
+  const handleDownloadPDF = async () => {
+    try {
+      // Se há alunos selecionados, gerar PDF para cada um
+      if (selectedStudents.length > 0) {
+        for (let i = 0; i < selectedStudents.length; i++) {
+          const student = selectedStudents[i];
+          const processedContent = replaceVariables(content, student);
+          
+          // Criar elemento temporário para o PDF
+          const tempElement = document.createElement('div');
+          tempElement.innerHTML = `
+            <div style="
+              width: 210mm;
+              min-height: 297mm;
+              background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
+              background-size: cover;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 5cm 1.27cm 3.3cm 1.27cm;
+              box-sizing: border-box;
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              line-height: 1.5;
+              color: black;
+            ">
+              ${processedContent}
+            </div>
+          `;
+          
+          const options = {
+            margin: 0,
+            filename: `contrato_${student.aluno.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          
+          await html2pdf().set(options).from(tempElement).save();
+          
+          // Pequeno delay entre downloads para evitar problemas
+          if (i < selectedStudents.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      } else {
+        // Gerar PDF sem substituições
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = `
+          <div style="
+            width: 210mm;
+            min-height: 297mm;
+            background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 5cm 1.27cm 3.3cm 1.27cm;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: black;
+          ">
+            ${content}
+          </div>
+        `;
+        
+        const options = {
+          margin: 0,
+          filename: `${contractTitle || 'contrato'}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        await html2pdf().set(options).from(tempElement).save();
+      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+    }
   };
 
   return (
@@ -101,20 +179,26 @@ export const ContractPreview = ({
                     </div>
                   </div>
                   
-                  <div
-                    className="prose prose-sm max-w-none bg-background p-6 rounded border print:shadow-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: replaceVariables(content, student) 
-                    }}
-                  />
+                   <TimbradoA4>
+                     <div
+                       className="prose prose-sm max-w-none print:shadow-none"
+                       style={{ fontSize: '12px', lineHeight: '1.5' }}
+                       dangerouslySetInnerHTML={{ 
+                         __html: replaceVariables(content, student) 
+                       }}
+                     />
+                   </TimbradoA4>
                 </div>
               ))
             ) : (
               // Mostrar documento com variáveis não substituídas quando não há alunos
-              <div
-                className="prose prose-sm max-w-none bg-background p-6 rounded border"
-                dangerouslySetInnerHTML={{ __html: content }}
-              />
+              <TimbradoA4>
+                <div
+                  className="prose prose-sm max-w-none print:shadow-none"
+                  style={{ fontSize: '12px', lineHeight: '1.5' }}
+                  dangerouslySetInnerHTML={{ __html: content }}
+                />
+              </TimbradoA4>
             )}
           </div>
         </ScrollArea>

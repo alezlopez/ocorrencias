@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { StudentSearch } from './StudentSearch';
 import { RichTextEditor } from './RichTextEditor';
 import { ContractPreview } from './ContractPreview';
+import html2pdf from 'html2pdf.js';
 
 interface ContractData {
   title: string;
@@ -117,6 +118,92 @@ export const ContractEditor = () => {
       title: "Contrato enviado!",
       description: message,
     });
+  };
+
+  const replaceVariables = (htmlContent: string, student?: Student) => {
+    let processedContent = htmlContent;
+    
+    if (student) {
+      processedContent = processedContent.replace(
+        /\{\{NOME_ALUNO\}\}/g, 
+        student.aluno || '[Nome do Aluno]'
+      );
+      processedContent = processedContent.replace(
+        /\{\{NOME_RESPONSAVEL\}\}/g, 
+        student.nome_responsavel || '[Nome do Responsável]'
+      );
+      
+      // Remover as classes de estilo das variáveis no PDF
+      processedContent = processedContent.replace(
+        /<span class="bg-primary\/10 text-primary px-2 py-1 rounded font-medium">/g,
+        '<span style="font-weight: bold; color: #000;">'
+      );
+    }
+    
+    return processedContent;
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      if (selectedStudents.length > 0) {
+        for (let i = 0; i < selectedStudents.length; i++) {
+          const student = selectedStudents[i];
+          const processedContent = replaceVariables(contractData.content, student);
+          
+          const tempElement = document.createElement('div');
+          tempElement.innerHTML = `
+            <div style="
+              width: 210mm;
+              min-height: 297mm;
+              background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
+              background-size: cover;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 5cm 1.27cm 3.3cm 1.27cm;
+              box-sizing: border-box;
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              line-height: 1.5;
+              color: black;
+            ">
+              ${processedContent}
+            </div>
+          `;
+          
+          const options = {
+            margin: 0,
+            filename: `contrato_${student.aluno.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          
+          await html2pdf().set(options).from(tempElement).save();
+          
+          if (i < selectedStudents.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
+        toast({
+          title: "PDFs gerados!",
+          description: `${selectedStudents.length} arquivo(s) baixado(s) com sucesso.`,
+        });
+      } else {
+        toast({
+          title: "Nenhum aluno selecionado",
+          description: "Selecione pelo menos um aluno para gerar o PDF.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao gerar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -228,7 +315,12 @@ export const ContractEditor = () => {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-3 justify-center">
-                  <Button variant="outline" size="lg" className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="flex items-center gap-2"
+                    onClick={handleDownloadPDF}
+                  >
                     <Download className="h-4 w-4" />
                     Baixar PDF
                   </Button>
