@@ -14,7 +14,8 @@ import {
   Type,
   Plus,
   User,
-  UserCheck
+  UserCheck,
+  Eye
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -26,9 +27,10 @@ import {
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
+  onPreview?: () => void;
 }
 
-export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
+export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
   const executeCommand = (command: string, value?: string) => {
@@ -201,6 +203,23 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {onPreview && (
+            <>
+              <Separator orientation="vertical" className="h-6" />
+              
+              {/* Preview Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onPreview}
+                className="flex items-center gap-1"
+              >
+                <Eye className="h-4 w-4" />
+                Preview
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Editor */}

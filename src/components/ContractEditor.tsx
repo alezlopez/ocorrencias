@@ -9,6 +9,7 @@ import { Upload, FileText, Eye, Download, Send, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { StudentSearch } from './StudentSearch';
 import { RichTextEditor } from './RichTextEditor';
+import { ContractPreview } from './ContractPreview';
 
 interface ContractData {
   title: string;
@@ -59,6 +60,7 @@ export const ContractEditor = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [batchMode, setBatchMode] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleContentChange = (content: string) => {
     setContractData(prev => ({ ...prev, content }));
@@ -203,6 +205,7 @@ export const ContractEditor = () => {
                 <RichTextEditor 
                   value={contractData.content}
                   onChange={handleContentChange}
+                  onPreview={() => setIsPreviewOpen(true)}
                 />
               </div>
 
@@ -249,36 +252,16 @@ export const ContractEditor = () => {
             </CardContent>
           </Card>
 
-          {/* Preview */}
+          {/* Ações */}
           <Card className="shadow-card animate-slide-up">
             <CardHeader className="bg-gradient-card rounded-t-lg">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Eye className="h-5 w-5 text-primary" />
-                  Preview do Contrato
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPreview(!showPreview)}
-                >
-                  {showPreview ? 'Editar' : 'Visualizar'}
-                </Button>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5 text-primary" />
+                Enviar Contrato
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {showPreview ? (
-                <div
-                  className="prose prose-sm max-w-none bg-background p-6 rounded border min-h-[400px]"
-                  dangerouslySetInnerHTML={{ __html: contractData.content }}
-                />
-              ) : (
-                <div className="bg-background p-6 rounded border min-h-[400px] font-mono text-sm whitespace-pre-wrap">
-                  {contractData.content}
-                </div>
-              )}
-              
-              <div className="mt-6 space-y-4">
+              <div className="space-y-4">
                 <div className="flex flex-wrap gap-3">
                   <Button variant="outline" className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
@@ -301,9 +284,16 @@ export const ContractEditor = () => {
                     <p className="text-sm text-muted-foreground">
                       <strong>Título:</strong> {contractData.title}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Partes:</strong> {contractData.parties}
-                    </p>
+                    {!batchMode && contractData.parties && (
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Partes:</strong> {contractData.parties}
+                      </p>
+                    )}
+                    {batchMode && selectedStudents.length > 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Alunos selecionados:</strong> {selectedStudents.length}
+                      </p>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       <strong>Anexos:</strong> {contractData.attachments.length} arquivo(s)
                     </p>
@@ -313,6 +303,16 @@ export const ContractEditor = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Preview Modal */}
+        <ContractPreview
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          content={contractData.content}
+          selectedStudents={selectedStudents}
+          contractTitle={contractData.title}
+          isBatchMode={batchMode}
+        />
       </div>
     </div>
   );
