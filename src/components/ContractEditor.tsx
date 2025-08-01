@@ -4,14 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, FileText, Eye, Download, Send } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Upload, FileText, Eye, Download, Send, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { StudentSearch } from './StudentSearch';
 
 interface ContractData {
   title: string;
   parties: string;
   content: string;
   attachments: File[];
+}
+
+interface Student {
+  codigo_aluno: number;
+  aluno: string;
+  nome_responsavel: string;
+  whatsapp_fin: string;
 }
 
 export const ContractEditor = () => {
@@ -46,6 +55,8 @@ export const ContractEditor = () => {
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContractData(prev => ({ ...prev, content: e.target.value }));
@@ -70,19 +81,49 @@ export const ContractEditor = () => {
     }));
   };
 
+  const handleStudentSelect = (student: Student) => {
+    setSelectedStudents(prev => [...prev, student]);
+  };
+
+  const handleStudentRemove = (codigoAluno: number) => {
+    setSelectedStudents(prev => prev.filter(student => student.codigo_aluno !== codigoAluno));
+  };
+
   const handleSendForSignature = () => {
-    if (!contractData.title || !contractData.parties) {
+    if (!contractData.title) {
       toast({
         title: "Campos obrigatórios",
-        description: "Por favor, preencha o título e as partes do contrato.",
+        description: "Por favor, preencha o título do contrato.",
         variant: "destructive",
       });
       return;
     }
 
+    if (batchMode && selectedStudents.length === 0) {
+      toast({
+        title: "Nenhum aluno selecionado",
+        description: "Selecione pelo menos um aluno para envio em lote.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!batchMode && !contractData.parties) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha as partes do contrato.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const message = batchMode 
+      ? `Contrato enviado para ${selectedStudents.length} responsável(eis)!`
+      : "Contrato enviado para assinatura eletrônica!";
+
     toast({
       title: "Contrato enviado!",
-      description: "O contrato foi enviado para assinatura eletrônica.",
+      description: message,
     });
   };
 
@@ -119,16 +160,41 @@ export const ContractEditor = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="parties">Partes Envolvidas *</Label>
-                <Input
-                  id="parties"
-                  value={contractData.parties}
-                  onChange={(e) => setContractData(prev => ({ ...prev, parties: e.target.value }))}
-                  placeholder="Ex: Empresa ABC e Cliente XYZ"
-                  className="transition-smooth"
+              <div className="flex items-center space-x-2 mb-4">
+                <Switch
+                  id="batch-mode"
+                  checked={batchMode}
+                  onCheckedChange={setBatchMode}
                 />
+                <Label htmlFor="batch-mode" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Envio em Lote
+                </Label>
               </div>
+
+              {batchMode ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Selecionar Alunos</Label>
+                    <StudentSearch
+                      selectedStudents={selectedStudents}
+                      onStudentSelect={handleStudentSelect}
+                      onStudentRemove={handleStudentRemove}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="parties">Partes Envolvidas *</Label>
+                  <Input
+                    id="parties"
+                    value={contractData.parties}
+                    onChange={(e) => setContractData(prev => ({ ...prev, parties: e.target.value }))}
+                    placeholder="Ex: Empresa ABC e Cliente XYZ"
+                    className="transition-smooth"
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="content">Conteúdo do Contrato</Label>
