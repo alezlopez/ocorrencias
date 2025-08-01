@@ -143,37 +143,39 @@ export const ContractEditor = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Editor */}
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Informações do Contrato */}
           <Card className="shadow-card animate-slide-up">
             <CardHeader className="bg-gradient-card rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
-                Editor de Contrato
+                Informações do Contrato
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="title">Título do Contrato *</Label>
-                <Input
-                  id="title"
-                  value={contractData.title}
-                  onChange={(e) => setContractData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Ex: Contrato de Prestação de Serviços"
-                  className="transition-smooth"
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Título do Contrato *</Label>
+                  <Input
+                    id="title"
+                    value={contractData.title}
+                    onChange={(e) => setContractData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Ex: Contrato de Prestação de Serviços"
+                    className="transition-smooth"
+                  />
+                </div>
 
-              <div className="flex items-center space-x-2 mb-4">
-                <Switch
-                  id="batch-mode"
-                  checked={batchMode}
-                  onCheckedChange={setBatchMode}
-                />
-                <Label htmlFor="batch-mode" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Envio em Lote
-                </Label>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="batch-mode"
+                    checked={batchMode}
+                    onCheckedChange={setBatchMode}
+                  />
+                  <Label htmlFor="batch-mode" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Envio em Lote
+                  </Label>
+                </div>
               </div>
 
               {batchMode ? (
@@ -199,75 +201,80 @@ export const ContractEditor = () => {
                   />
                 </div>
               )}
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label>Conteúdo do Contrato</Label>
-                <RichTextEditor 
-                  value={contractData.content}
-                  onChange={handleContentChange}
-                  onPreview={() => setIsPreviewOpen(true)}
+          {/* Editor de Contrato */}
+          <Card className="shadow-card animate-slide-up">
+            <CardContent className="p-6">
+              <RichTextEditor 
+                value={contractData.content}
+                onChange={handleContentChange}
+                onPreview={() => setIsPreviewOpen(true)}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Anexos */}
+          <Card className="shadow-card animate-slide-up">
+            <CardHeader className="bg-gradient-card rounded-t-lg">
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5 text-primary" />
+                Anexos (Opcional)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
+                <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-2">
+                  Arraste arquivos aqui ou clique para selecionar
+                </p>
+                <Input
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="file-upload"
                 />
+                <Label htmlFor="file-upload" className="cursor-pointer">
+                  <Button variant="outline" type="button">
+                    Selecionar Arquivos
+                  </Button>
+                </Label>
               </div>
 
-              <div className="space-y-4">
-                <Label>Anexos (Opcional)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
-                  <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-2">
-                    Arraste arquivos aqui ou clique para selecionar
-                  </p>
-                  <Input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.txt"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <Label htmlFor="file-upload" className="cursor-pointer">
-                    <Button variant="outline" type="button">
-                      Selecionar Arquivos
-                    </Button>
-                  </Label>
+              {contractData.attachments.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Arquivos Anexados:</Label>
+                  {contractData.attachments.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-accent rounded">
+                      <span className="text-sm">{file.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeAttachment(index)}
+                      >
+                        Remover
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-
-                {contractData.attachments.length > 0 && (
-                  <div className="space-y-2">
-                    <Label>Arquivos Anexados:</Label>
-                    {contractData.attachments.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-accent rounded">
-                        <span className="text-sm">{file.name}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeAttachment(index)}
-                        >
-                          Remover
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Ações */}
           <Card className="shadow-card animate-slide-up">
-            <CardHeader className="bg-gradient-card rounded-t-lg">
-              <CardTitle className="flex items-center gap-2">
-                <Send className="h-5 w-5 text-primary" />
-                Enviar Contrato
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="flex flex-wrap gap-3">
-                  <Button variant="outline" className="flex items-center gap-2">
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button variant="outline" size="lg" className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
                     Baixar PDF
                   </Button>
                   <Button 
+                    size="lg"
                     className="flex items-center gap-2 bg-gradient-primary hover:opacity-90 transition-smooth"
                     onClick={handleSendForSignature}
                   >
@@ -279,24 +286,26 @@ export const ContractEditor = () => {
                 {contractData.title && (
                   <div className="p-4 bg-accent rounded-lg">
                     <h4 className="font-semibold text-sm text-foreground mb-2">
-                      Informações do Contrato:
+                      Resumo do Contrato:
                     </h4>
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Título:</strong> {contractData.title}
-                    </p>
-                    {!batchMode && contractData.parties && (
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Partes:</strong> {contractData.parties}
-                      </p>
-                    )}
-                    {batchMode && selectedStudents.length > 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Alunos selecionados:</strong> {selectedStudents.length}
-                      </p>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Anexos:</strong> {contractData.attachments.length} arquivo(s)
-                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                      <div>
+                        <strong>Título:</strong> {contractData.title}
+                      </div>
+                      {!batchMode && contractData.parties && (
+                        <div>
+                          <strong>Partes:</strong> {contractData.parties}
+                        </div>
+                      )}
+                      {batchMode && selectedStudents.length > 0 && (
+                        <div>
+                          <strong>Alunos selecionados:</strong> {selectedStudents.length}
+                        </div>
+                      )}
+                      <div>
+                        <strong>Anexos:</strong> {contractData.attachments.length} arquivo(s)
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
