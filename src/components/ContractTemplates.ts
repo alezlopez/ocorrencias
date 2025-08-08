@@ -8,7 +8,7 @@ export interface ContractTemplate {
 export const CONTRACT_TEMPLATES: ContractTemplate[] = [
   {
     id: 'grau_leve',
-    name: 'Grau Leve',
+    name: 'Retirado pelo responsável',
     description: 'Comunicado para lesão leve sofrida pelo aluno',
     content: `<h2 style="text-align: center; margin-bottom: 40px;">COMUNICADO DE OCORRÊNCIA</h2>
 
