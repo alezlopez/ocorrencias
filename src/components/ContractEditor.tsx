@@ -153,7 +153,7 @@ export const ContractEditor = () => {
         };
 
         // Enviar para a edge function
-        const { error } = await supabase.functions.invoke('send-to-zapsign', {
+        const { data, error } = await supabase.functions.invoke('send-to-zapsign', {
           body: webhookData
         });
 
@@ -161,6 +161,14 @@ export const ContractEditor = () => {
           console.error('Erro ao enviar para ZapSign:', error);
           throw new Error(`Erro ao enviar documento para ${student.aluno}: ${error.message}`);
         }
+
+        // Verificar se houve erro na resposta da edge function
+        if (data && !data.success) {
+          console.error('Webhook retornou erro:', data);
+          throw new Error(`Erro ao enviar documento para ${student.aluno}: ${data.error}`);
+        }
+
+        console.log(`Documento enviado com sucesso para ${student.aluno}:`, data);
 
         // Aguardar entre envios para não sobrecarregar
         if (i < selectedStudents.length - 1) {
