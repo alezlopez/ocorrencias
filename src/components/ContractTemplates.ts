@@ -25,15 +25,12 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
 
 <div style="margin-top: 60px;">
 <p><strong>Responsável:</strong> <strong>{{NOME_RESPONSAVEL}}</strong></p>
-<p style="margin-top: 40px;">_____________________________</p>
 </div>
 
 <div style="margin-top: 60px;">
 <p><strong>Testemunhas da escola:</strong></p>
 <p style="margin-top: 20px;">1 - Alexandre Zampieri Lopez</p>
-<p style="margin-top: 40px;">_________________________</p>
 <p style="margin-top: 20px;">2 - Daniel Stroebele</p>
-<p style="margin-top: 40px;">_________________________</p>
 </div>`
   },
   {
