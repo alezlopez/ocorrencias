@@ -12,14 +12,14 @@ interface Student {
   nome_responsavel: string;
   whatsapp_fin: string;
   CPF_resp_fin: string;
-  cpf_pai?: string;
-  cpf_mae?: string;
-  telefone_pai?: string;
-  telefone_mae?: string;
-  nome_pai?: string;
-  nome_mae?: string;
-  email_pai?: string;
-  email_mae?: string;
+  cpf_pai: string | null;
+  cpf_mae: string | null;
+  telefone_pai: string | null;
+  telefone_mae: string | null;
+  nome_pai: string | null;
+  nome_mae: string | null;
+  email_pai: string | null;
+  email_mae: string | null;
   selectedParent?: 'pai' | 'mae';
 }
 
@@ -198,9 +198,9 @@ export const ContractPreview = ({
                     </h4>
                     <div className="text-sm text-muted-foreground space-y-1">
                       <p><strong>Aluno:</strong> {student.aluno}</p>
-                      <p><strong>Responsável:</strong> Em desenvolvimento</p>
-                      <p><strong>CPF:</strong> Em desenvolvimento</p>
-                      <p><strong>Telefone:</strong> Em desenvolvimento</p>
+                      <p><strong>Responsável:</strong> {student.selectedParent === 'pai' ? student.nome_pai : student.nome_mae} ({student.selectedParent === 'pai' ? 'Pai' : 'Mãe'})</p>
+                      <p><strong>CPF:</strong> {student.selectedParent === 'pai' ? student.cpf_pai : student.cpf_mae}</p>
+                      <p><strong>Telefone:</strong> {student.selectedParent === 'pai' ? student.telefone_pai : student.telefone_mae}</p>
                     </div>
                   </div>
                   

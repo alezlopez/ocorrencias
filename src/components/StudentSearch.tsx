@@ -13,14 +13,14 @@ interface Student {
   nome_responsavel: string;
   whatsapp_fin: string;
   CPF_resp_fin: string;
-  cpf_pai?: string;
-  cpf_mae?: string;
-  telefone_pai?: string;
-  telefone_mae?: string;
-  nome_pai?: string;
-  nome_mae?: string;
-  email_pai?: string;
-  email_mae?: string;
+  cpf_pai: string | null;
+  cpf_mae: string | null;
+  telefone_pai: string | null;
+  telefone_mae: string | null;
+  nome_pai: string | null;
+  nome_mae: string | null;
+  email_pai: string | null;
+  email_mae: string | null;
   selectedParent?: 'pai' | 'mae';
 }
 
@@ -46,7 +46,7 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     try {
       const { data, error } = await supabase
         .from('alunosIntegraSae')
-        .select('codigo_aluno, aluno, nome_responsavel, whatsapp_fin, CPF_resp_fin')
+        .select('*')
         .ilike('aluno', `%${term}%`)
         .limit(10);
 
@@ -69,7 +69,24 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
         !selectedStudents.some(selected => selected.codigo_aluno === student.codigo_aluno)
       );
 
-      setSearchResults(filteredResults);
+      // Mapear os dados do banco para nossa interface Student
+      const mappedResults: Student[] = filteredResults.map((item: any) => ({
+        codigo_aluno: item.codigo_aluno,
+        aluno: item.aluno,
+        nome_responsavel: item.nome_responsavel,
+        whatsapp_fin: item.whatsapp_fin,
+        CPF_resp_fin: item.CPF_resp_fin,
+        cpf_pai: item.cpf_pai || null,
+        cpf_mae: item.cpf_mae || null,
+        telefone_pai: item.telefone_pai || null,
+        telefone_mae: item.telefone_mae || null,
+        nome_pai: item.nome_pai || null,
+        nome_mae: item.nome_mae || null,
+        email_pai: item.email_pai || null,
+        email_mae: item.email_mae || null
+      }));
+
+      setSearchResults(mappedResults);
     } catch (error) {
       console.error('Erro ao buscar alunos:', error);
       toast({
@@ -161,28 +178,28 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
                       {/* Pai */}
                       <button
                         onClick={() => onParentSelect(student.codigo_aluno, 'pai')}
-                        className="p-3 border rounded-lg hover:bg-accent transition-colors text-left opacity-50"
-                        disabled={true}
+                        className="p-3 border rounded-lg hover:bg-accent transition-colors text-left"
+                        disabled={!student.nome_pai && !student.cpf_pai}
                       >
                         <div className="text-sm font-medium mb-1">👨 Pai</div>
                         <div className="text-xs text-muted-foreground space-y-1">
-                          <div>Nome: Em desenvolvimento</div>
-                          <div>CPF: Em desenvolvimento</div>
-                          <div>Tel: Em desenvolvimento</div>
+                          <div>Nome: {student.nome_pai || 'Não informado'}</div>
+                          <div>CPF: {student.cpf_pai || 'Não informado'}</div>
+                          <div>Tel: {student.telefone_pai || 'Não informado'}</div>
                         </div>
                       </button>
                       
                       {/* Mãe */}
                       <button
                         onClick={() => onParentSelect(student.codigo_aluno, 'mae')}
-                        className="p-3 border rounded-lg hover:bg-accent transition-colors text-left opacity-50"
-                        disabled={true}
+                        className="p-3 border rounded-lg hover:bg-accent transition-colors text-left"
+                        disabled={!student.nome_mae && !student.cpf_mae}
                       >
                         <div className="text-sm font-medium mb-1">👩 Mãe</div>
                         <div className="text-xs text-muted-foreground space-y-1">
-                          <div>Nome: Em desenvolvimento</div>
-                          <div>CPF: Em desenvolvimento</div>
-                          <div>Tel: Em desenvolvimento</div>
+                          <div>Nome: {student.nome_mae || 'Não informado'}</div>
+                          <div>CPF: {student.cpf_mae || 'Não informado'}</div>
+                          <div>Tel: {student.telefone_mae || 'Não informado'}</div>
                         </div>
                       </button>
                     </div>
@@ -193,9 +210,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
                       Responsável selecionado: {student.selectedParent === 'pai' ? '👨 Pai' : '👩 Mãe'}
                     </div>
                     <div className="text-xs text-muted-foreground space-y-1">
-                      <div>Nome: Em desenvolvimento</div>
-                      <div>CPF: Em desenvolvimento</div>
-                      <div>Tel: Em desenvolvimento</div>
+                      <div>Nome: {student.selectedParent === 'pai' ? student.nome_pai : student.nome_mae}</div>
+                      <div>CPF: {student.selectedParent === 'pai' ? student.cpf_pai : student.cpf_mae}</div>
+                      <div>Tel: {student.selectedParent === 'pai' ? student.telefone_pai : student.telefone_mae}</div>
                     </div>
                     <button
                       onClick={() => onParentSelect(student.codigo_aluno, student.selectedParent === 'pai' ? 'mae' : 'pai')}

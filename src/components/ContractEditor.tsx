@@ -25,14 +25,14 @@ interface Student {
   nome_responsavel: string;
   whatsapp_fin: string;
   CPF_resp_fin: string;
-  cpf_pai?: string;
-  cpf_mae?: string;
-  telefone_pai?: string;
-  telefone_mae?: string;
-  nome_pai?: string;
-  nome_mae?: string;
-  email_pai?: string;
-  email_mae?: string;
+  cpf_pai: string | null;
+  cpf_mae: string | null;
+  telefone_pai: string | null;
+  telefone_mae: string | null;
+  nome_pai: string | null;
+  nome_mae: string | null;
+  email_pai: string | null;
+  email_mae: string | null;
   selectedParent?: 'pai' | 'mae';
 }
 
