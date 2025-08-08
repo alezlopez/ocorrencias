@@ -213,12 +213,21 @@ export const ContractEditor = () => {
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center animate-fade-in">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Sistema de Documentos Escolares
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Selecione o aluno, escolha o modelo e gere documentos automaticamente
-          </p>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <img 
+              src="/lovable-uploads/f23dd2df-3cc1-4994-b227-eb27c08bb994.png" 
+              alt="Colégio Zampieri Logo" 
+              className="h-20 w-20 object-contain"
+            />
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">
+                Envio de Ocorrências para assinatura
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Selecione o aluno, escolha o modelo e gere documentos automaticamente
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="max-w-6xl mx-auto space-y-6">
