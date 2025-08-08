@@ -12,6 +12,15 @@ interface Student {
   nome_responsavel: string;
   whatsapp_fin: string;
   CPF_resp_fin: string;
+  cpf_pai?: string;
+  cpf_mae?: string;
+  telefone_pai?: string;
+  telefone_mae?: string;
+  nome_pai?: string;
+  nome_mae?: string;
+  email_pai?: string;
+  email_mae?: string;
+  selectedParent?: 'pai' | 'mae';
 }
 
 interface ContractPreviewProps {
@@ -42,18 +51,28 @@ export const ContractPreview = ({
       today
     );
     
-    if (student) {
+    if (student && student.selectedParent) {
+      const isParentPai = student.selectedParent === 'pai';
+      
       processedContent = processedContent.replace(
         /\{\{NOME_ALUNO\}\}/g, 
         student.aluno || '[Nome do Aluno]'
       );
       processedContent = processedContent.replace(
         /\{\{NOME_RESPONSAVEL\}\}/g, 
-        student.nome_responsavel || '[Nome do Responsável]'
+        (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{CPF_RESPONSAVEL\}\}/g, 
-        student.CPF_resp_fin || '[CPF do Responsável]'
+        (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]'
+      );
+      processedContent = processedContent.replace(
+        /\{\{TELEFONE_RESPONSAVEL\}\}/g, 
+        (isParentPai ? student.telefone_pai : student.telefone_mae) || '[Telefone do Responsável]'
+      );
+      processedContent = processedContent.replace(
+        /\{\{EMAIL_RESPONSAVEL\}\}/g, 
+        (isParentPai ? student.email_pai : student.email_mae) || '[Email do Responsável]'
       );
     }
     
@@ -179,8 +198,9 @@ export const ContractPreview = ({
                     </h4>
                     <div className="text-sm text-muted-foreground space-y-1">
                       <p><strong>Aluno:</strong> {student.aluno}</p>
-                      <p><strong>Responsável:</strong> {student.nome_responsavel}</p>
-                      <p><strong>WhatsApp:</strong> {student.whatsapp_fin}</p>
+                      <p><strong>Responsável:</strong> Em desenvolvimento</p>
+                      <p><strong>CPF:</strong> Em desenvolvimento</p>
+                      <p><strong>Telefone:</strong> Em desenvolvimento</p>
                     </div>
                   </div>
                   

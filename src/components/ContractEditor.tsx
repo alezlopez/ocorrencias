@@ -25,6 +25,15 @@ interface Student {
   nome_responsavel: string;
   whatsapp_fin: string;
   CPF_resp_fin: string;
+  cpf_pai?: string;
+  cpf_mae?: string;
+  telefone_pai?: string;
+  telefone_mae?: string;
+  nome_pai?: string;
+  nome_mae?: string;
+  email_pai?: string;
+  email_mae?: string;
+  selectedParent?: 'pai' | 'mae';
 }
 
 export const ContractEditor = () => {
@@ -75,6 +84,14 @@ export const ContractEditor = () => {
     setSelectedStudents(prev => prev.filter(student => student.codigo_aluno !== codigoAluno));
   };
 
+  const handleParentSelect = (codigoAluno: number, parentType: 'pai' | 'mae') => {
+    setSelectedStudents(prev => prev.map(student => 
+      student.codigo_aluno === codigoAluno 
+        ? { ...student, selectedParent: parentType }
+        : student
+    ));
+  };
+
   const handleSendForSignature = () => {
     if (!selectedTemplate) {
       toast({
@@ -114,18 +131,28 @@ export const ContractEditor = () => {
       today
     );
     
-    if (student) {
+    if (student && student.selectedParent) {
+      const isParentPai = student.selectedParent === 'pai';
+      
       processedContent = processedContent.replace(
         /\{\{NOME_ALUNO\}\}/g, 
         student.aluno || '[Nome do Aluno]'
       );
       processedContent = processedContent.replace(
         /\{\{NOME_RESPONSAVEL\}\}/g, 
-        student.nome_responsavel || '[Nome do Responsável]'
+        (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{CPF_RESPONSAVEL\}\}/g, 
-        student.CPF_resp_fin || '[CPF do Responsável]'
+        (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]'
+      );
+      processedContent = processedContent.replace(
+        /\{\{TELEFONE_RESPONSAVEL\}\}/g, 
+        (isParentPai ? student.telefone_pai : student.telefone_mae) || '[Telefone do Responsável]'
+      );
+      processedContent = processedContent.replace(
+        /\{\{EMAIL_RESPONSAVEL\}\}/g, 
+        (isParentPai ? student.email_pai : student.email_mae) || '[Email do Responsável]'
       );
     }
     
@@ -231,12 +258,13 @@ export const ContractEditor = () => {
                 selectedStudents={selectedStudents}
                 onStudentSelect={handleStudentSelect}
                 onStudentRemove={handleStudentRemove}
+                onParentSelect={handleParentSelect}
               />
             </CardContent>
           </Card>
 
           {/* Seleção de Modelo */}
-          {selectedStudents.length > 0 && (
+          {selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
             <Card className="shadow-card animate-slide-up">
               <CardHeader className="bg-gradient-card rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
@@ -254,7 +282,7 @@ export const ContractEditor = () => {
           )}
 
           {/* Preview do Documento */}
-          {selectedTemplate && selectedStudents.length > 0 && (
+          {selectedTemplate && selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
             <Card className="shadow-card animate-slide-up">
               <CardHeader className="bg-gradient-card rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
@@ -338,7 +366,7 @@ export const ContractEditor = () => {
           </Card>
 
           {/* Ações */}
-          {selectedTemplate && selectedStudents.length > 0 && (
+          {selectedTemplate && selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
             <Card className="shadow-card animate-slide-up">
               <CardContent className="p-6">
                 <div className="space-y-4">
