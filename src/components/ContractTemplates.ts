@@ -10,13 +10,13 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
     id: 'grau_leve',
     name: 'Grau Leve',
     description: 'Comunicado para lesão leve sofrida pelo aluno',
-    content: `<h2 style="text-align: center; margin-bottom: 30px;">COMUNICADO DE OCORRÊNCIA</h2>
+    content: `<h2 style="text-align: center; margin-bottom: 40px;">COMUNICADO DE OCORRÊNCIA</h2>
 
-<p>Informamos que, na data de <strong>{{DATA_HOJE}}</strong>, a escola entrou em contato com o(a) Sr(a). <strong>{{NOME_RESPONSAVEL}}</strong>, CPF: <strong>{{CPF_RESPONSAVEL}}</strong>, responsável legal pelo aluno <strong>{{NOME_ALUNO}}</strong> para comunicar sobre uma lesão leve sofrida pelo(a) aluno(a) citado(a).</p>
+<p style="margin-bottom: 25px; line-height: 1.6;">Informamos que, na data de <strong>{{DATA_HOJE}}</strong>, a escola entrou em contato com o(a) Sr(a). <strong>{{NOME_RESPONSAVEL}}</strong>, CPF: <strong>{{CPF_RESPONSAVEL}}</strong>, responsável legal pelo aluno <strong>{{NOME_ALUNO}}</strong> para comunicar sobre uma lesão leve sofrida pelo(a) aluno(a) citado(a).</p>
 
-<p>Após o contato e ciência do ocorrido, o(a) responsável compareceu à escola e retirou o(a) aluno(a), assumindo a responsabilidade pelo acompanhamento e demais providências fora do ambiente escolar.</p>
+<p style="margin-bottom: 25px; line-height: 1.6;">Após o contato e ciência do ocorrido, o(a) responsável compareceu à escola e retirou o(a) aluno(a), assumindo a responsabilidade pelo acompanhamento e demais providências fora do ambiente escolar.</p>
 
-<p>Solicitamos a assinatura abaixo para ciência, registro da retirada e encerramento do atendimento interno referente à ocorrência.</p>
+<p style="margin-bottom: 40px; line-height: 1.6;">Solicitamos a assinatura abaixo para ciência, registro da retirada e encerramento do atendimento interno referente à ocorrência.</p>
 
 <p style="margin-top: 40px;">Atenciosamente,<br/>
 <strong>Coordenação</strong><br/>
