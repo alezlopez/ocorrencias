@@ -18,22 +18,22 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
 
 <p>Solicitamos a assinatura abaixo para ciência, registro da retirada e encerramento do atendimento interno referente à ocorrência.</p>
 
-<p style="margin-top: 40px;">Atenciosamente,</p>
-
-<p><strong>Coordenação</strong><br/>
-<strong>Colégio Zampieri – Escolinha de educação infantil pingo de ouro ltda.</strong></p>
+<p style="margin-top: 40px;">Atenciosamente,<br/>
+<strong>Coordenação</strong><br/>
+<strong>Colégio Zampieri</strong><br/>
+<strong>55.704.506/0001-73</strong></p>
 
 <div style="margin-top: 60px;">
-<p><strong>Assinatura do(a) responsável:</strong></p>
-<p>_____________________________</p>
+<p><strong>Responsável:</strong> <strong>{{NOME_RESPONSAVEL}}</strong></p>
+<p style="margin-top: 40px;">_____________________________</p>
 </div>
 
-<div style="margin-top: 40px;">
+<div style="margin-top: 60px;">
 <p><strong>Testemunhas da escola:</strong></p>
-<p>1 - Cristiane Rodrigues Brito</p>
-<p>_________________________</p>
-<p>2 - Mariana da Silva Batista</p>
-<p>_________________________</p>
+<p style="margin-top: 20px;">1 - Alexandre Zampieri Lopez</p>
+<p style="margin-top: 40px;">_________________________</p>
+<p style="margin-top: 20px;">2 - Daniel Stroebele</p>
+<p style="margin-top: 40px;">_________________________</p>
 </div>`
   },
   {
@@ -42,7 +42,8 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
     description: 'Contrato padrão para prestação de serviços educacionais',
     content: `<h2 style="text-align: center; margin-bottom: 30px;">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h2>
 
-<p><strong>CONTRATANTE:</strong> Colégio Zampieri – Escolinha de educação infantil pingo de ouro ltda.</p>
+<p><strong>CONTRATANTE:</strong> Colégio Zampieri<br/>
+<strong>CNPJ:</strong> 55.704.506/0001-73</p>
 <p><strong>CONTRATADO:</strong> <strong>{{NOME_RESPONSAVEL}}</strong></p>
 <p><strong>CPF:</strong> <strong>{{CPF_RESPONSAVEL}}</strong></p>
 <p><strong>ALUNO:</strong> <strong>{{NOME_ALUNO}}</strong></p>
@@ -74,7 +75,7 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
 
 <div style="margin-top: 60px;">
 <p>Data: <strong>{{DATA_HOJE}}</strong></p>
-<p>Assinatura do Contratante: _________________________</p>
+<p>Assinatura do Contratante (Colégio Zampieri - CNPJ: 55.704.506/0001-73): _________________________</p>
 <p>Assinatura do Contratado (<strong>{{NOME_RESPONSAVEL}}</strong>): _________________________</p>
 </div>`
   },
@@ -99,10 +100,10 @@ export const CONTRACT_TEMPLATES: ContractTemplate[] = [
 <p>Para maiores esclarecimentos, favor entrar em contato com a coordenação da escola.</p>
 </div>
 
-<p style="margin-top: 40px;">Atenciosamente,</p>
-
-<p><strong>Coordenação</strong><br/>
-<strong>Colégio Zampieri – Escolinha de educação infantil pingo de ouro ltda.</strong></p>
+<p style="margin-top: 40px;">Atenciosamente,<br/>
+<strong>Coordenação</strong><br/>
+<strong>Colégio Zampieri</strong><br/>
+<strong>55.704.506/0001-73</strong></p>
 
 <div style="margin-top: 60px;">
 <p><strong>Ciente:</strong></p>
