@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Upload, FileText, Download, Send } from 'lucide-react';
+import { FileText, Download, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
@@ -16,7 +13,6 @@ interface ContractData {
   title: string;
   parties: string;
   content: string;
-  attachments: File[];
 }
 
 interface Student {
@@ -40,8 +36,7 @@ export const ContractEditor = () => {
   const [contractData, setContractData] = useState<ContractData>({
     title: '',
     parties: '',
-    content: '',
-    attachments: []
+    content: ''
   });
 
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
@@ -57,24 +52,6 @@ export const ContractEditor = () => {
     }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setContractData(prev => ({ 
-      ...prev, 
-      attachments: [...prev.attachments, ...files] 
-    }));
-    toast({
-      title: "Arquivo anexado",
-      description: `${files.length} arquivo(s) anexado(s) com sucesso.`,
-    });
-  };
-
-  const removeAttachment = (index: number) => {
-    setContractData(prev => ({
-      ...prev,
-      attachments: prev.attachments.filter((_, i) => i !== index)
-    }));
-  };
 
   const handleStudentSelect = (student: Student) => {
     setSelectedStudents(prev => [...prev, student]);
@@ -316,54 +293,6 @@ export const ContractEditor = () => {
             </Card>
           )}
 
-          {/* Anexos */}
-          <Card className="shadow-card animate-slide-up">
-            <CardHeader className="bg-gradient-card rounded-t-lg">
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5 text-primary" />
-                Anexos (Opcional)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
-                <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-2">
-                  Arraste arquivos aqui ou clique para selecionar
-                </p>
-                <Input
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.txt"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <Label htmlFor="file-upload" className="cursor-pointer">
-                  <Button variant="outline" type="button">
-                    Selecionar Arquivos
-                  </Button>
-                </Label>
-              </div>
-
-              {contractData.attachments.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Arquivos Anexados:</Label>
-                  {contractData.attachments.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-accent rounded">
-                      <span className="text-sm">{file.name}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeAttachment(index)}
-                      >
-                        Remover
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
           {/* Ações */}
           {selectedTemplate && selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
@@ -394,15 +323,12 @@ export const ContractEditor = () => {
                     <h4 className="font-semibold text-sm text-foreground mb-2">
                       Resumo do Documento:
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                       <div>
                         <strong>Modelo:</strong> {contractData.title}
                       </div>
                       <div>
                         <strong>Alunos selecionados:</strong> {selectedStudents.length}
-                      </div>
-                      <div>
-                        <strong>Anexos:</strong> {contractData.attachments.length} arquivo(s)
                       </div>
                     </div>
                   </div>
