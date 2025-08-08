@@ -12,6 +12,7 @@ interface Student {
   aluno: string;
   nome_responsavel: string;
   whatsapp_fin: string;
+  CPF_resp_fin: string;
 }
 
 interface StudentSearchProps {
@@ -35,7 +36,7 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     try {
       const { data, error } = await supabase
         .from('alunosIntegraSae')
-        .select('codigo_aluno, aluno, nome_responsavel, whatsapp_fin')
+        .select('codigo_aluno, aluno, nome_responsavel, whatsapp_fin, CPF_resp_fin')
         .ilike('aluno', `%${term}%`)
         .limit(10);
 

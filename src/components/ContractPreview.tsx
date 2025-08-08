@@ -11,6 +11,7 @@ interface Student {
   aluno: string;
   nome_responsavel: string;
   whatsapp_fin: string;
+  CPF_resp_fin: string;
 }
 
 interface ContractPreviewProps {
@@ -34,8 +35,14 @@ export const ContractPreview = ({
   const replaceVariables = (htmlContent: string, student?: Student) => {
     let processedContent = htmlContent;
     
+    // Sempre substituir a data atual
+    const today = new Date().toLocaleDateString('pt-BR');
+    processedContent = processedContent.replace(
+      /\{\{DATA_HOJE\}\}/g, 
+      today
+    );
+    
     if (student) {
-      // Substituir variáveis pelos dados do aluno
       processedContent = processedContent.replace(
         /\{\{NOME_ALUNO\}\}/g, 
         student.aluno || '[Nome do Aluno]'
@@ -44,11 +51,9 @@ export const ContractPreview = ({
         /\{\{NOME_RESPONSAVEL\}\}/g, 
         student.nome_responsavel || '[Nome do Responsável]'
       );
-      
-      // Remover as classes de estilo das variáveis no preview
       processedContent = processedContent.replace(
-        /<span class="bg-primary\/10 text-primary px-2 py-1 rounded font-medium">/g,
-        '<span class="font-semibold text-primary">'
+        /\{\{CPF_RESPONSAVEL\}\}/g, 
+        student.CPF_resp_fin || '[CPF do Responsável]'
       );
     }
     
