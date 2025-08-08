@@ -1,1 +1,4 @@
 project_id = "lzdhrtcugqnqmyapgmbs"
+
+[functions.send-to-zapsign]
+verify_jwt = false

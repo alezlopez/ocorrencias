@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, Send } from 'lucide-react';
+import { FileText, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
 import { ContractPreview } from './ContractPreview';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
+import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
 
 interface ContractData {
@@ -69,7 +70,7 @@ export const ContractEditor = () => {
     ));
   };
 
-  const handleSendForSignature = () => {
+  const handleSendForSignature = async () => {
     if (!selectedTemplate) {
       toast({
         title: "Modelo não selecionado",
@@ -88,14 +89,102 @@ export const ContractEditor = () => {
       return;
     }
 
-    const message = selectedStudents.length > 1 
-      ? `Documento enviado para ${selectedStudents.length} responsável(eis)!`
-      : "Documento enviado para assinatura eletrônica!";
+    try {
+      toast({
+        title: "Processando...",
+        description: "Gerando documentos e enviando para assinatura...",
+      });
 
-    toast({
-      title: "Documento enviado!",
-      description: message,
-    });
+      for (let i = 0; i < selectedStudents.length; i++) {
+        const student = selectedStudents[i];
+        const processedContent = replaceVariables(contractData.content, student);
+        
+        // Gerar PDF em base64
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = `
+          <div style="
+            width: 210mm;
+            min-height: 297mm;
+            background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 5cm 1.27cm 3.3cm 1.27cm;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: black;
+          ">
+            ${processedContent}
+          </div>
+        `;
+        
+        const options = {
+          margin: 0,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        const pdfBlob = await html2pdf().set(options).from(tempElement).outputPdf('blob');
+        
+        // Converter para base64
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
+            resolve(base64String.split(',')[1]); // Remove o prefixo "data:..."
+          };
+          reader.readAsDataURL(pdfBlob);
+        });
+
+        // Preparar dados para envio
+        const isParentPai = student.selectedParent === 'pai';
+        const nomeResponsavel = (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]';
+        const cpfResponsavel = (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]';
+        
+        const webhookData = {
+          nomeResponsavel,
+          cpfResponsavel,
+          whatsapp: student.whatsapp_fin || '[WhatsApp não informado]',
+          base64,
+          nomeAluno: student.aluno
+        };
+
+        // Enviar para a edge function
+        const { error } = await supabase.functions.invoke('send-to-zapsign', {
+          body: webhookData
+        });
+
+        if (error) {
+          console.error('Erro ao enviar para ZapSign:', error);
+          throw new Error(`Erro ao enviar documento para ${student.aluno}: ${error.message}`);
+        }
+
+        // Aguardar entre envios para não sobrecarregar
+        if (i < selectedStudents.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      const message = selectedStudents.length > 1 
+        ? `Documentos enviados para ${selectedStudents.length} responsáveis!`
+        : "Documento enviado para assinatura eletrônica!";
+
+      toast({
+        title: "Documentos enviados!",
+        description: message,
+      });
+
+    } catch (error) {
+      console.error('Erro ao enviar documentos:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao enviar documentos. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const replaceVariables = (htmlContent: string, student?: Student) => {
@@ -134,79 +223,6 @@ export const ContractEditor = () => {
     }
     
     return processedContent;
-  };
-
-  const handleDownloadPDF = async () => {
-    try {
-      if (!selectedTemplate) {
-        toast({
-          title: "Modelo não selecionado",
-          description: "Por favor, selecione um modelo antes de gerar o PDF.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (selectedStudents.length === 0) {
-        toast({
-          title: "Nenhum aluno selecionado",
-          description: "Selecione pelo menos um aluno para gerar o PDF.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      for (let i = 0; i < selectedStudents.length; i++) {
-        const student = selectedStudents[i];
-        const processedContent = replaceVariables(contractData.content, student);
-        
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = `
-          <div style="
-            width: 210mm;
-            min-height: 297mm;
-            background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 5cm 1.27cm 3.3cm 1.27cm;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.5;
-            color: black;
-          ">
-            ${processedContent}
-          </div>
-        `;
-        
-        const options = {
-          margin: 0,
-          filename: `${contractData.title}_${student.aluno.replace(/\s+/g, '_')}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        
-        await html2pdf().set(options).from(tempElement).save();
-        
-        if (i < selectedStudents.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-      
-      toast({
-        title: "PDFs gerados!",
-        description: `${selectedStudents.length} arquivo(s) baixado(s) com sucesso.`,
-      });
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao gerar o PDF. Tente novamente.",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -309,15 +325,6 @@ export const ContractEditor = () => {
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-3 justify-center">
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="flex items-center gap-2"
-                      onClick={handleDownloadPDF}
-                    >
-                      <Download className="h-4 w-4" />
-                      Baixar PDF
-                    </Button>
                     <Button 
                       size="lg"
                       className="flex items-center gap-2 bg-gradient-primary hover:opacity-90 transition-smooth"
