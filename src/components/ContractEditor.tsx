@@ -42,6 +42,7 @@ export const ContractEditor = () => {
 
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [documentType, setDocumentType] = useState<'ocorrencias' | 'atas' | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleTemplateSelect = (template: ContractTemplate) => {
@@ -245,10 +246,10 @@ export const ContractEditor = () => {
             />
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">
-                Envio de Ocorrências para assinatura
+                Envio de Documentos para Assinatura
               </h1>
               <p className="text-muted-foreground text-lg">
-                Selecione o aluno, escolha o modelo e gere documentos automaticamente
+                Selecione o aluno, defina o tipo e escolha o modelo
               </p>
             </div>
           </div>
@@ -273,22 +274,57 @@ export const ContractEditor = () => {
             </CardContent>
           </Card>
 
-          {/* Seleção de Modelo */}
+          {/* Tipo de Documento */}
           {selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
-            <Card className="shadow-card animate-slide-up">
-              <CardHeader className="bg-gradient-card rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  2. Escolher Modelo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <TemplateSelector
-                  selectedTemplate={selectedTemplate}
-                  onTemplateSelect={handleTemplateSelect}
-                />
-              </CardContent>
-            </Card>
+            <>
+              <Card className="shadow-card animate-slide-up">
+                <CardHeader className="bg-gradient-card rounded-t-lg">
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    2. Tipo de Documento
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant={documentType === 'ocorrencias' ? 'default' : 'outline'}
+                      onClick={() => { setDocumentType('ocorrencias'); setSelectedTemplate(null); }}
+                    >
+                      Ocorrências
+                    </Button>
+                    <Button
+                      variant={documentType === 'atas' ? 'default' : 'outline'}
+                      onClick={() => { setDocumentType('atas'); setSelectedTemplate(null); }}
+                    >
+                      Atas
+                    </Button>
+                  </div>
+                  {documentType === 'atas' && (
+                    <p className="text-sm text-muted-foreground mt-3">
+                      Modelos de Atas: confirme se devemos usar modelos pré-definidos ou outra forma de envio.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Seleção de Modelo (apenas Ocorrências) */}
+              {documentType === 'ocorrencias' && (
+                <Card className="shadow-card animate-slide-up">
+                  <CardHeader className="bg-gradient-card rounded-t-lg">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      3. Escolher Modelo
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <TemplateSelector
+                      selectedTemplate={selectedTemplate}
+                      onTemplateSelect={handleTemplateSelect}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </>
           )}
 
           {/* Preview do Documento */}
@@ -297,7 +333,7 @@ export const ContractEditor = () => {
               <CardHeader className="bg-gradient-card rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  3. Preview do Documento
+                  4. Preview do Documento
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
