@@ -17,20 +17,22 @@ interface ContractData {
 }
 
 interface Student {
-  codigo_aluno: number;
-  aluno: string;
-  nome_responsavel: string;
-  whatsapp_fin: string;
-  CPF_resp_fin: string;
-  cpf_pai: string | null;
-  cpf_mae: string | null;
-  telefone_pai: string | null;
-  telefone_mae: string | null;
-  nome_pai: string | null;
-  nome_mae: string | null;
-  email_pai: string | null;
-  email_mae: string | null;
-  selectedParent?: 'pai' | 'mae';
+  id: number;
+  name: string;
+  parents: {
+    name: string;
+    cpf: string;
+    email: string;
+    phone: string;
+    type: string;
+  }[];
+  selectedParent?: {
+    name: string;
+    cpf: string;
+    email: string;
+    phone: string;
+    type: string;
+  } | null;
 }
 
 export const ContractEditor = () => {
@@ -59,14 +61,14 @@ export const ContractEditor = () => {
     setSelectedStudents(prev => [...prev, student]);
   };
 
-  const handleStudentRemove = (codigoAluno: number) => {
-    setSelectedStudents(prev => prev.filter(student => student.codigo_aluno !== codigoAluno));
+  const handleStudentRemove = (studentId: number) => {
+    setSelectedStudents(prev => prev.filter(student => student.id !== studentId));
   };
 
-  const handleParentSelect = (codigoAluno: number, parentType: 'pai' | 'mae') => {
+  const handleParentSelect = (studentId: number, parent: { name: string; cpf: string; email: string; phone: string; type: string }) => {
     setSelectedStudents(prev => prev.map(student => 
-      student.codigo_aluno === codigoAluno 
-        ? { ...student, selectedParent: parentType }
+      student.id === studentId 
+        ? { ...student, selectedParent: parent }
         : student
     ));
   };
@@ -141,16 +143,16 @@ export const ContractEditor = () => {
         });
 
         // Preparar dados para envio
-        const isParentPai = student.selectedParent === 'pai';
-        const nomeResponsavel = (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]';
-        const cpfResponsavel = (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]';
+        const selectedParent = student.selectedParent;
+        const nomeResponsavel = selectedParent ? selectedParent.name : '[Nome do Responsável]';
+        const cpfResponsavel = selectedParent ? selectedParent.cpf : '[CPF do Responsável]';
         
         const webhookData = {
           nomeResponsavel,
           cpfResponsavel,
-          whatsapp: student.whatsapp_fin || '[WhatsApp não informado]',
+          whatsapp: selectedParent ? selectedParent.phone : '[WhatsApp não informado]',
           base64,
-          nomeAluno: student.aluno
+          nomeAluno: student.name
         };
 
         // Enviar para a edge function
@@ -160,16 +162,16 @@ export const ContractEditor = () => {
 
         if (error) {
           console.error('Erro ao enviar para ZapSign:', error);
-          throw new Error(`Erro ao enviar documento para ${student.aluno}: ${error.message}`);
+          throw new Error(`Erro ao enviar documento para ${student.name}: ${error.message}`);
         }
 
         // Verificar se houve erro na resposta da edge function
         if (data && !data.success) {
           console.error('Webhook retornou erro:', data);
-          throw new Error(`Erro ao enviar documento para ${student.aluno}: ${data.error}`);
+          throw new Error(`Erro ao enviar documento para ${student.name}: ${data.error}`);
         }
 
-        console.log(`Documento enviado com sucesso para ${student.aluno}:`, data);
+        console.log(`Documento enviado com sucesso para ${student.name}:`, data);
 
         // Aguardar entre envios para não sobrecarregar
         if (i < selectedStudents.length - 1) {
@@ -207,27 +209,27 @@ export const ContractEditor = () => {
     );
     
     if (student && student.selectedParent) {
-      const isParentPai = student.selectedParent === 'pai';
+      const selectedParent = student.selectedParent;
       
       processedContent = processedContent.replace(
         /\{\{NOME_ALUNO\}\}/g, 
-        student.aluno || '[Nome do Aluno]'
+        student.name || '[Nome do Aluno]'
       );
       processedContent = processedContent.replace(
         /\{\{NOME_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]'
+        selectedParent.name || '[Nome do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{CPF_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]'
+        selectedParent.cpf || '[CPF do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{TELEFONE_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.telefone_pai : student.telefone_mae) || '[Telefone do Responsável]'
+        selectedParent.phone || '[Telefone do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{EMAIL_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.email_pai : student.email_mae) || '[Email do Responsável]'
+        selectedParent.email || '[Email do Responsável]'
       );
     }
     
@@ -265,12 +267,12 @@ export const ContractEditor = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <StudentSearch
-                selectedStudents={selectedStudents}
-                onStudentSelect={handleStudentSelect}
-                onStudentRemove={handleStudentRemove}
-                onParentSelect={handleParentSelect}
-              />
+                <StudentSearch
+                  selectedStudents={selectedStudents}
+                  onStudentSelect={handleStudentSelect}
+                  onStudentRemove={handleStudentRemove}
+                  onParentSelect={handleParentSelect}
+                />
             </CardContent>
           </Card>
 

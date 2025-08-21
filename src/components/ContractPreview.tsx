@@ -7,20 +7,22 @@ import { TimbradoA4 } from './TimbradoA4';
 import html2pdf from 'html2pdf.js';
 
 interface Student {
-  codigo_aluno: number;
-  aluno: string;
-  nome_responsavel: string;
-  whatsapp_fin: string;
-  CPF_resp_fin: string;
-  cpf_pai: string | null;
-  cpf_mae: string | null;
-  telefone_pai: string | null;
-  telefone_mae: string | null;
-  nome_pai: string | null;
-  nome_mae: string | null;
-  email_pai: string | null;
-  email_mae: string | null;
-  selectedParent?: 'pai' | 'mae';
+  id: number;
+  name: string;
+  parents: {
+    name: string;
+    cpf: string;
+    email: string;
+    phone: string;
+    type: string;
+  }[];
+  selectedParent?: {
+    name: string;
+    cpf: string;
+    email: string;
+    phone: string;
+    type: string;
+  } | null;
 }
 
 interface ContractPreviewProps {
@@ -52,27 +54,27 @@ export const ContractPreview = ({
     );
     
     if (student && student.selectedParent) {
-      const isParentPai = student.selectedParent === 'pai';
+      const selectedParent = student.selectedParent;
       
       processedContent = processedContent.replace(
         /\{\{NOME_ALUNO\}\}/g, 
-        student.aluno || '[Nome do Aluno]'
+        student.name || '[Nome do Aluno]'
       );
       processedContent = processedContent.replace(
         /\{\{NOME_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.nome_pai : student.nome_mae) || '[Nome do Responsável]'
+        selectedParent.name || '[Nome do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{CPF_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.cpf_pai : student.cpf_mae) || '[CPF do Responsável]'
+        selectedParent.cpf || '[CPF do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{TELEFONE_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.telefone_pai : student.telefone_mae) || '[Telefone do Responsável]'
+        selectedParent.phone || '[Telefone do Responsável]'
       );
       processedContent = processedContent.replace(
         /\{\{EMAIL_RESPONSAVEL\}\}/g, 
-        (isParentPai ? student.email_pai : student.email_mae) || '[Email do Responsável]'
+        selectedParent.email || '[Email do Responsável]'
       );
     }
     
@@ -110,7 +112,7 @@ export const ContractPreview = ({
           
           const options = {
             margin: 0,
-            filename: `contrato_${student.aluno.replace(/\s+/g, '_')}.pdf`,
+            filename: `contrato_${student.name.replace(/\s+/g, '_')}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -183,7 +185,7 @@ export const ContractPreview = ({
             {isBatchMode && selectedStudents.length > 0 ? (
               // Modo lote - mostrar um documento para cada aluno
               selectedStudents.map((student, index) => (
-                <div key={student.codigo_aluno} className="space-y-4">
+                <div key={student.id} className="space-y-4">
                   {index > 0 && (
                     <div className="border-t border-dashed border-border pt-8">
                       <div className="text-center text-sm text-muted-foreground mb-4">
@@ -197,10 +199,10 @@ export const ContractPreview = ({
                       Documento {index + 1}:
                     </h4>
                     <div className="text-sm text-muted-foreground space-y-1">
-                      <p><strong>Aluno:</strong> {student.aluno}</p>
-                      <p><strong>Responsável:</strong> {student.selectedParent === 'pai' ? student.nome_pai : student.nome_mae} ({student.selectedParent === 'pai' ? 'Pai' : 'Mãe'})</p>
-                      <p><strong>CPF:</strong> {student.selectedParent === 'pai' ? student.cpf_pai : student.cpf_mae}</p>
-                      <p><strong>Telefone:</strong> {student.selectedParent === 'pai' ? student.telefone_pai : student.telefone_mae}</p>
+                      <p><strong>Aluno:</strong> {student.name}</p>
+                      <p><strong>Responsável:</strong> {student.selectedParent?.name} ({student.selectedParent?.type})</p>
+                      <p><strong>CPF:</strong> {student.selectedParent?.cpf}</p>
+                      <p><strong>Telefone:</strong> {student.selectedParent?.phone}</p>
                     </div>
                   </div>
                   
