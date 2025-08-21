@@ -47,9 +47,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('alunosIntegraSae')
+        .from('ocorrencias')
         .select('*')
-        .ilike('aluno', `%${term}%`)
+        .ilike('Nome do Aluno', `%${term}%`)
         .limit(10);
 
       if (error) {
@@ -68,20 +68,27 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
       }
 
       const filteredResults = (data as any[])?.filter((student: any) => 
-        !selectedStudents.some(selected => selected.id === student.codigo_aluno)
+        !selectedStudents.some(selected => selected.id === student["Cod Aluno"])
       ) || [];
 
       // Mapear os dados do banco para nossa interface Student
       const mappedResults: Student[] = filteredResults.map((item: any) => ({
-        id: item.codigo_aluno,
-        name: item.aluno,
+        id: item["Cod Aluno"],
+        name: item["Nome do Aluno"],
         parents: [
           {
-            name: item.nome_responsavel || "Não informado",
-            cpf: item.CPF_resp_fin || "",
-            email: item.email_pai || "",
-            phone: item.whatsapp_fin || "",
-            type: "Responsável"
+            name: item["Nome do Pai"] || "Não informado",
+            cpf: item["CPF do Pai"] || "",
+            email: item["Email do Pai"] || "",
+            phone: item["Telefone do Pai"] || "",
+            type: "Pai"
+          },
+          {
+            name: item["Nome da mãe"] || "Não informado", 
+            cpf: item["CPF da mãe"] || "",
+            email: item["Email da Mãe"] || "",
+            phone: item["Telefone da Mãe"] || "",
+            type: "Mãe"
           }
         ].filter(parent => parent.name !== "Não informado"),
         selectedParent: null
