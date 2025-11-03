@@ -186,7 +186,7 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
                 Variáveis
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="bg-background z-50">
               <DropdownMenuItem
                 onClick={() => insertVariable('{{NOME_ALUNO}}')}
                 className="flex items-center gap-2"
@@ -195,11 +195,53 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
                 Nome do Aluno
               </DropdownMenuItem>
               <DropdownMenuItem
+                onClick={() => insertVariable('{{NOME_PAI}}')}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Nome do Pai
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => insertVariable('{{NOME_MAE}}')}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Nome da Mãe
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => insertVariable('{{NOME_RESPONSAVEL}}')}
                 className="flex items-center gap-2"
               >
                 <UserCheck className="h-4 w-4" />
                 Nome do Responsável
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => insertVariable('{{CPF_RESPONSAVEL}}')}
+                className="flex items-center gap-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                CPF do Responsável
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => insertVariable('{{TELEFONE_RESPONSAVEL}}')}
+                className="flex items-center gap-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                Telefone do Responsável
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => insertVariable('{{EMAIL_RESPONSAVEL}}')}
+                className="flex items-center gap-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                Email do Responsável
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => insertVariable('{{DATA_HOJE}}')}
+                className="flex items-center gap-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                Data de Hoje
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -238,8 +280,16 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
         {/* Help Text */}
         <div className="text-xs text-muted-foreground bg-accent/50 p-3 rounded">
           <p className="font-medium mb-1">Variáveis disponíveis:</p>
-          <p><code className="bg-background px-1 rounded">{'{{NOME_ALUNO}}'}</code> - Será substituído pelo nome do aluno</p>
-          <p><code className="bg-background px-1 rounded">{'{{NOME_RESPONSAVEL}}'}</code> - Será substituído pelo nome do responsável</p>
+          <div className="grid grid-cols-2 gap-1">
+            <p><code className="bg-background px-1 rounded">{'{{NOME_ALUNO}}'}</code> - Nome do aluno</p>
+            <p><code className="bg-background px-1 rounded">{'{{NOME_PAI}}'}</code> - Nome do pai</p>
+            <p><code className="bg-background px-1 rounded">{'{{NOME_MAE}}'}</code> - Nome da mãe</p>
+            <p><code className="bg-background px-1 rounded">{'{{NOME_RESPONSAVEL}}'}</code> - Nome do responsável</p>
+            <p><code className="bg-background px-1 rounded">{'{{CPF_RESPONSAVEL}}'}</code> - CPF do responsável</p>
+            <p><code className="bg-background px-1 rounded">{'{{TELEFONE_RESPONSAVEL}}'}</code> - Telefone</p>
+            <p><code className="bg-background px-1 rounded">{'{{EMAIL_RESPONSAVEL}}'}</code> - Email</p>
+            <p><code className="bg-background px-1 rounded">{'{{DATA_HOJE}}'}</code> - Data atual</p>
+          </div>
         </div>
       </CardContent>
     </Card>

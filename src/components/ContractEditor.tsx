@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
 import { ContractPreview } from './ContractPreview';
+import { RichTextEditor } from './RichTextEditor';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
 import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
@@ -450,20 +451,10 @@ export const ContractEditor = () => {
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
                     <div>
-                      <Label htmlFor="diversosText" className="mb-2 block">
-                        Texto do Documento
-                      </Label>
-                      <Textarea
-                        id="diversosText"
-                        placeholder="Digite o texto do documento aqui. Use as variáveis: {{NOME_ALUNO}}, {{NOME_PAI}}, {{NOME_MAE}}, {{NOME_RESPONSAVEL}}"
+                      <RichTextEditor
                         value={diversosText}
-                        onChange={(e) => setDiversosText(e.target.value)}
-                        rows={8}
-                        className="w-full"
+                        onChange={setDiversosText}
                       />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        <strong>Variáveis disponíveis:</strong> {'{{NOME_ALUNO}}'}, {'{{NOME_PAI}}'}, {'{{NOME_MAE}}'}, {'{{NOME_RESPONSAVEL}}'}, {'{{CPF_RESPONSAVEL}}'}, {'{{TELEFONE_RESPONSAVEL}}'}, {'{{EMAIL_RESPONSAVEL}}'}, {'{{DATA_HOJE}}'}
-                      </p>
                     </div>
 
                     <div>
