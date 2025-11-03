@@ -68,9 +68,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('ocorrencias')
+        .from('alunos_comunicados_whatsapp')
         .select('*')
-        .ilike('Nome do Aluno', `%${term}%`)
+        .ilike('nome_do_aluno', `%${term}%`)
         .limit(10);
 
       if (error) {
@@ -89,25 +89,25 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
       }
 
       const filteredResults = (data as any[])?.filter((student: any) => 
-        !selectedStudents.some(selected => selected.id === student["Cod Aluno"])
+        !selectedStudents.some(selected => selected.id.toString() === student.codigo_aluno)
       ) || [];
 
       const mappedResults: Student[] = filteredResults.map((item: any) => ({
-        id: item["Cod Aluno"],
-        name: item["Nome do Aluno"],
+        id: parseInt(item.codigo_aluno),
+        name: item.nome_do_aluno,
         parents: [
           {
-            name: item["Nome do Pai"] || "Não informado",
-            cpf: item["CPF do Pai"] || "",
-            email: item["Email do Pai"] || "",
-            phone: item["Telefone do Pai"] || "",
+            name: item.nome_pai || "Não informado",
+            cpf: item.cpf_pai || "",
+            email: "",
+            phone: item.ddd_pai && item.celular_pai ? `${item.ddd_pai}${item.celular_pai}` : "",
             type: "Pai"
           },
           {
-            name: item["Nome da mãe"] || "Não informado", 
-            cpf: item["CPF da mãe"] || "",
-            email: item["Email da Mãe"] || "",
-            phone: item["Telefone da Mãe"] || "",
+            name: item.nome_da_mae || "Não informado", 
+            cpf: item.cpf_mae || "",
+            email: "",
+            phone: item.ddd_mae && item.celular_mae ? `${item.ddd_mae}${item.celular_mae}` : "",
             type: "Mãe"
           }
         ].filter(parent => parent.name !== "Não informado"),
@@ -146,10 +146,12 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
 
       const codigosAlunos = turmaData.map((item: any) => item.Código);
 
+      const codigosAlunosStr = codigosAlunos.map(c => c.toString());
+      
       const { data: alunosData, error: alunosError } = await supabase
-        .from('ocorrencias')
+        .from('alunos_comunicados_whatsapp')
         .select('*')
-        .in('Cod Aluno', codigosAlunos);
+        .in('codigo_aluno', codigosAlunosStr);
 
       if (alunosError || !alunosData) {
         toast({
@@ -161,23 +163,23 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
       }
 
       const mappedStudents: Student[] = alunosData
-        .filter((item: any) => !selectedStudents.some(selected => selected.id === item["Cod Aluno"]))
+        .filter((item: any) => !selectedStudents.some(selected => selected.id.toString() === item.codigo_aluno))
         .map((item: any) => ({
-          id: item["Cod Aluno"],
-          name: item["Nome do Aluno"],
+          id: parseInt(item.codigo_aluno),
+          name: item.nome_do_aluno,
           parents: [
             {
-              name: item["Nome do Pai"] || "Não informado",
-              cpf: item["CPF do Pai"] || "",
-              email: item["Email do Pai"] || "",
-              phone: item["Telefone do Pai"] || "",
+              name: item.nome_pai || "Não informado",
+              cpf: item.cpf_pai || "",
+              email: "",
+              phone: item.ddd_pai && item.celular_pai ? `${item.ddd_pai}${item.celular_pai}` : "",
               type: "Pai"
             },
             {
-              name: item["Nome da mãe"] || "Não informado",
-              cpf: item["CPF da mãe"] || "",
-              email: item["Email da Mãe"] || "",
-              phone: item["Telefone da Mãe"] || "",
+              name: item.nome_da_mae || "Não informado",
+              cpf: item.cpf_mae || "",
+              email: "",
+              phone: item.ddd_mae && item.celular_mae ? `${item.ddd_mae}${item.celular_mae}` : "",
               type: "Mãe"
             }
           ].filter(parent => parent.name !== "Não informado"),
