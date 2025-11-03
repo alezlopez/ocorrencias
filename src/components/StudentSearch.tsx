@@ -46,12 +46,12 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   useEffect(() => {
     const fetchTurmas = async () => {
       const { data, error } = await supabase
-        .from('turmas_alunos')
-        .select('Turma')
-        .order('Turma');
+        .from('alunos_comunicados_whatsapp')
+        .select('turma')
+        .order('turma');
       
       if (!error && data) {
-        const uniqueTurmas = [...new Set(data.map(item => item.Turma).filter(Boolean))] as string[];
+        const uniqueTurmas = [...new Set(data.map(item => item.turma).filter(Boolean))] as string[];
         setTurmas(uniqueTurmas);
       }
     };
@@ -130,30 +130,17 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   const selectTurmaStudents = async (turma: string) => {
     setIsSearching(true);
     try {
-      const { data: turmaData, error: turmaError } = await supabase
-        .from('turmas_alunos')
-        .select('Código')
-        .eq('Turma', turma);
-
-      if (turmaError || !turmaData) {
-        toast({
-          title: "Erro",
-          description: "Não foi possível buscar alunos da turma.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const codigosAlunos = turmaData.map((item: any) => item.Código);
-
-      const codigosAlunosStr = codigosAlunos.map(c => c.toString());
+      console.log('Buscando alunos da turma:', turma);
       
       const { data: alunosData, error: alunosError } = await supabase
         .from('alunos_comunicados_whatsapp')
         .select('*')
-        .in('codigo_aluno', codigosAlunosStr);
+        .eq('turma', turma);
+
+      console.log('Dados dos alunos:', { alunosData, alunosError });
 
       if (alunosError || !alunosData) {
+        console.error('Erro ao buscar alunos:', alunosError);
         toast({
           title: "Erro",
           description: "Não foi possível buscar dados dos alunos.",
@@ -185,6 +172,8 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
           ].filter(parent => parent.name !== "Não informado"),
           selectedParent: null
         }));
+
+      console.log('Alunos mapeados:', mappedStudents);
 
       mappedStudents.forEach(student => onStudentSelect(student));
       
