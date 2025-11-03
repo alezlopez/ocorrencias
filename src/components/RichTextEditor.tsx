@@ -33,20 +33,52 @@ interface RichTextEditorProps {
 export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Forçar LTR ao montar o componente
+  // Forçar LTR e prevenir auto-detecção
   React.useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.style.direction = 'ltr';
-      editorRef.current.style.unicodeBidi = 'embed';
-      editorRef.current.setAttribute('dir', 'ltr');
+      const editor = editorRef.current;
+      editor.style.direction = 'ltr';
+      editor.style.unicodeBidi = 'plaintext';
+      editor.setAttribute('dir', 'ltr');
+      
+      // Observer para forçar LTR em todos os elementos criados dinamicamente
+      const observer = new MutationObserver(() => {
+        const allElements = editor.querySelectorAll('*');
+        allElements.forEach((el) => {
+          if (el instanceof HTMLElement) {
+            el.removeAttribute('dir');
+            el.style.direction = 'ltr';
+          }
+        });
+      });
+      
+      observer.observe(editor, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['dir']
+      });
+      
+      return () => observer.disconnect();
     }
   }, []);
 
   const executeCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     if (editorRef.current) {
-      // Garantir que a direção continue LTR após comandos
-      editorRef.current.style.direction = 'ltr';
+      // Forçar LTR após comandos
+      const editor = editorRef.current;
+      editor.style.direction = 'ltr';
+      
+      // Remover dir="rtl" de todos os elementos
+      const allElements = editor.querySelectorAll('[dir="rtl"]');
+      allElements.forEach(el => {
+        el.removeAttribute('dir');
+        if (el instanceof HTMLElement) {
+          el.style.direction = 'ltr';
+        }
+      });
+      
       onChange(editorRef.current.innerHTML);
     }
   };
@@ -83,9 +115,31 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
 
   const handleInput = () => {
     if (editorRef.current) {
-      // Garantir que a direção continue LTR durante a digitação
-      editorRef.current.style.direction = 'ltr';
-      onChange(editorRef.current.innerHTML);
+      const editor = editorRef.current;
+      
+      // Garantir LTR durante digitação
+      editor.style.direction = 'ltr';
+      
+      // Remover qualquer dir="rtl" adicionado pelo navegador
+      const allElements = editor.querySelectorAll('[dir="rtl"]');
+      allElements.forEach(el => {
+        el.removeAttribute('dir');
+        if (el instanceof HTMLElement) {
+          el.style.direction = 'ltr';
+        }
+      });
+      
+      onChange(editor.innerHTML);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevenir comandos que podem adicionar RTL
+    if (e.ctrlKey || e.metaKey) {
+      if (e.shiftKey && (e.key === 'X' || e.key === 'x')) {
+        // Ctrl+Shift+X pode adicionar RTL em alguns navegadores
+        e.preventDefault();
+      }
     }
   };
 
@@ -289,17 +343,18 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
         <div
           ref={editorRef}
           contentEditable
+          suppressContentEditableWarning
           onInput={handleInput}
+          onKeyDown={handleKeyDown}
           dangerouslySetInnerHTML={{ __html: value }}
           dir="ltr"
-          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none"
+          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none [&_*]:!direction-ltr"
           style={{
             lineHeight: '1.6',
             fontFamily: 'inherit',
             direction: 'ltr',
             textAlign: 'left',
-            unicodeBidi: 'embed',
-            writingMode: 'horizontal-tb'
+            unicodeBidi: 'plaintext'
           }}
         />
 
