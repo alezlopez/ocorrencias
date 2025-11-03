@@ -304,29 +304,34 @@ export const ContractEditor = () => {
         }))
       );
 
-      for (const student of selectedStudents) {
+      // Preparar array com dados de todos os alunos
+      const alunos = selectedStudents.map(student => {
         const processedText = replaceVariables(diversosText, student);
         
-        const payload = {
+        return {
           texto: processedText,
           nomeAluno: student.name,
           nomeResponsavel: student.selectedParent?.name || '',
           cpfResponsavel: student.selectedParent?.cpf || '',
-          whatsapp: student.selectedParent?.phone || '',
-          arquivos: arquivosBase64
+          whatsapp: student.selectedParent?.phone || ''
         };
+      });
 
-        const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+      const payload = {
+        alunos,
+        arquivos: arquivosBase64
+      };
 
-        if (!response.ok) {
-          throw new Error(`Erro ao enviar documento para ${student.name}`);
-        }
+      const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao enviar documentos');
       }
 
       toast({
