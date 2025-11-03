@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Search, X, User, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Student {
   id: number;
@@ -37,6 +39,25 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Student[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectionType, setSelectionType] = useState<'individual' | 'turma'>('individual');
+  const [turmas, setTurmas] = useState<string[]>([]);
+  const [selectedTurma, setSelectedTurma] = useState<string>('');
+
+  useEffect(() => {
+    const fetchTurmas = async () => {
+      const { data, error } = await supabase
+        .from('turmas_alunos')
+        .select('Turma')
+        .order('Turma');
+      
+      if (!error && data) {
+        const uniqueTurmas = [...new Set(data.map(item => item.Turma).filter(Boolean))] as string[];
+        setTurmas(uniqueTurmas);
+      }
+    };
+    
+    fetchTurmas();
+  }, []);
 
   const searchStudents = async (term: string) => {
     if (term.length < 2) {
@@ -71,7 +92,6 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
         !selectedStudents.some(selected => selected.id === student["Cod Aluno"])
       ) || [];
 
-      // Mapear os dados do banco para nossa interface Student
       const mappedResults: Student[] = filteredResults.map((item: any) => ({
         id: item["Cod Aluno"],
         name: item["Nome do Aluno"],
@@ -107,6 +127,81 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     }
   };
 
+  const selectTurmaStudents = async (turma: string) => {
+    setIsSearching(true);
+    try {
+      const { data: turmaData, error: turmaError } = await supabase
+        .from('turmas_alunos')
+        .select('Código')
+        .eq('Turma', turma);
+
+      if (turmaError || !turmaData) {
+        toast({
+          title: "Erro",
+          description: "Não foi possível buscar alunos da turma.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const codigosAlunos = turmaData.map((item: any) => item.Código);
+
+      const { data: alunosData, error: alunosError } = await supabase
+        .from('ocorrencias')
+        .select('*')
+        .in('Cod Aluno', codigosAlunos);
+
+      if (alunosError || !alunosData) {
+        toast({
+          title: "Erro",
+          description: "Não foi possível buscar dados dos alunos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const mappedStudents: Student[] = alunosData
+        .filter((item: any) => !selectedStudents.some(selected => selected.id === item["Cod Aluno"]))
+        .map((item: any) => ({
+          id: item["Cod Aluno"],
+          name: item["Nome do Aluno"],
+          parents: [
+            {
+              name: item["Nome do Pai"] || "Não informado",
+              cpf: item["CPF do Pai"] || "",
+              email: item["Email do Pai"] || "",
+              phone: item["Telefone do Pai"] || "",
+              type: "Pai"
+            },
+            {
+              name: item["Nome da mãe"] || "Não informado",
+              cpf: item["CPF da mãe"] || "",
+              email: item["Email da Mãe"] || "",
+              phone: item["Telefone da Mãe"] || "",
+              type: "Mãe"
+            }
+          ].filter(parent => parent.name !== "Não informado"),
+          selectedParent: null
+        }));
+
+      mappedStudents.forEach(student => onStudentSelect(student));
+      
+      toast({
+        title: "Turma adicionada",
+        description: `${mappedStudents.length} alunos da turma ${turma} foram adicionados.`,
+      });
+    } catch (error) {
+      console.error('Erro ao buscar turma:', error);
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao buscar turma.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       searchStudents(searchTerm);
@@ -123,39 +218,74 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
 
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar aluno pelo nome..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-        
-        {searchResults.length > 0 && (
-          <Card className="absolute z-10 w-full mt-1 shadow-lg">
-            <CardContent className="p-0">
-              {searchResults.map((student) => (
-                <button
-                 key={student.id}
-                  onClick={() => handleStudentSelect(student)}
-                  className="w-full p-3 text-left hover:bg-accent transition-colors border-b border-border last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium text-sm">{student.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Responsável: {student.parents[0]?.name || 'Não informado'} • Tel: {student.parents[0]?.phone || 'Não informado'}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      <Tabs value={selectionType} onValueChange={(v) => setSelectionType(v as 'individual' | 'turma')}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="individual">
+            <User className="h-4 w-4 mr-2" />
+            Aluno Individual
+          </TabsTrigger>
+          <TabsTrigger value="turma">
+            <Users className="h-4 w-4 mr-2" />
+            Turma Completa
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="individual" className="mt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar aluno pelo nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+            
+            {searchResults.length > 0 && (
+              <Card className="absolute z-10 w-full mt-1 shadow-lg">
+                <CardContent className="p-0">
+                  {searchResults.map((student) => (
+                    <button
+                     key={student.id}
+                      onClick={() => handleStudentSelect(student)}
+                      className="w-full p-3 text-left hover:bg-accent transition-colors border-b border-border last:border-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-sm">{student.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Responsável: {student.parents[0]?.name || 'Não informado'} • Tel: {student.parents[0]?.phone || 'Não informado'}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="turma" className="mt-4">
+          <div className="space-y-3">
+            <Select value={selectedTurma} onValueChange={(turma) => {
+              setSelectedTurma(turma);
+              selectTurmaStudents(turma);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma turma..." />
+              </SelectTrigger>
+              <SelectContent>
+                {turmas.map((turma) => (
+                  <SelectItem key={turma} value={turma}>
+                    {turma}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {selectedStudents.length > 0 && (
         <div className="space-y-4">
