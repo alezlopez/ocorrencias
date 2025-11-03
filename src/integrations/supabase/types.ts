@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      alunos_comunicados_whatsapp: {
+        Row: {
+          celular_mae: string | null
+          celular_pai: string | null
+          codigo_aluno: string
+          cpf_mae: string | null
+          cpf_pai: string | null
+          ddd_mae: string | null
+          ddd_pai: string | null
+          ID: number
+          nome_da_mae: string | null
+          nome_do_aluno: string | null
+          nome_pai: string | null
+          turma: string | null
+        }
+        Insert: {
+          celular_mae?: string | null
+          celular_pai?: string | null
+          codigo_aluno: string
+          cpf_mae?: string | null
+          cpf_pai?: string | null
+          ddd_mae?: string | null
+          ddd_pai?: string | null
+          ID?: number
+          nome_da_mae?: string | null
+          nome_do_aluno?: string | null
+          nome_pai?: string | null
+          turma?: string | null
+        }
+        Update: {
+          celular_mae?: string | null
+          celular_pai?: string | null
+          codigo_aluno?: string
+          cpf_mae?: string | null
+          cpf_pai?: string | null
+          ddd_mae?: string | null
+          ddd_pai?: string | null
+          ID?: number
+          nome_da_mae?: string | null
+          nome_do_aluno?: string | null
+          nome_pai?: string | null
+          turma?: string | null
+        }
+        Relationships: []
+      }
       alunosIntegraSae: {
         Row: {
           aluno: string | null
