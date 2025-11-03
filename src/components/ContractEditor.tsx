@@ -255,6 +255,20 @@ export const ContractEditor = () => {
     return processedContent;
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        // Remove o prefixo "data:...;base64,"
+        const base64 = base64String.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSendDiversos = async () => {
     if (!diversosText.trim()) {
       toast({
@@ -280,24 +294,34 @@ export const ContractEditor = () => {
         description: "Enviando documentos diversos...",
       });
 
+      // Converter arquivos para base64
+      const arquivosBase64 = await Promise.all(
+        diversosFiles.map(async (file) => ({
+          nome: file.name,
+          tipo: file.type,
+          tamanho: file.size,
+          base64: await fileToBase64(file)
+        }))
+      );
+
       for (const student of selectedStudents) {
         const processedText = replaceVariables(diversosText, student);
         
-        const formData = new FormData();
-        formData.append('texto', processedText);
-        formData.append('nomeAluno', student.name);
-        formData.append('nomeResponsavel', student.selectedParent?.name || '');
-        formData.append('cpfResponsavel', student.selectedParent?.cpf || '');
-        formData.append('whatsapp', student.selectedParent?.phone || '');
-        
-        // Adicionar arquivos ao FormData
-        diversosFiles.forEach((file, index) => {
-          formData.append(`arquivo_${index}`, file);
-        });
+        const payload = {
+          texto: processedText,
+          nomeAluno: student.name,
+          nomeResponsavel: student.selectedParent?.name || '',
+          cpfResponsavel: student.selectedParent?.cpf || '',
+          whatsapp: student.selectedParent?.phone || '',
+          arquivos: arquivosBase64
+        };
 
         const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
