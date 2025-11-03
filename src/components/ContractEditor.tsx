@@ -276,6 +276,25 @@ export const ContractEditor = () => {
             </CardContent>
           </Card>
 
+          {/* Mensagem de instruções quando alunos estão selecionados mas sem responsável */}
+          {selectedStudents.length > 0 && !selectedStudents.every(s => s.selectedParent) && (
+            <Card className="shadow-card animate-slide-up border-primary/50">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3 p-4 bg-primary/10 rounded-lg">
+                  <FileText className="h-5 w-5 text-primary mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">
+                      Próximo passo
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Selecione um responsável (Pai ou Mãe) para cada aluno antes de continuar para as abas de Ocorrências e Atas.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Tipo de Documento */}
           {selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
             <>
