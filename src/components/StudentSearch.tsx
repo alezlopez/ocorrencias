@@ -92,27 +92,31 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
         !selectedStudents.some(selected => selected.id.toString() === student.codigo_aluno)
       ) || [];
 
-      const mappedResults: Student[] = filteredResults.map((item: any) => ({
-        id: parseInt(item.codigo_aluno),
-        name: item.nome_do_aluno,
-        parents: [
+      const mappedResults: Student[] = filteredResults.map((item: any) => {
+        const parents = [
           {
             name: item.nome_pai || "Não informado",
-            cpf: item.cpf_pai || "",
+            cpf: (item.cpf_pai && item.cpf_pai !== "null") ? item.cpf_pai : "",
             email: "",
-            phone: item.ddd_pai && item.celular_pai ? `${item.ddd_pai}${item.celular_pai}` : "",
+            phone: (item.ddd_pai && item.celular_pai && item.celular_pai !== "null") ? `${item.ddd_pai}${item.celular_pai}` : "",
             type: "Pai"
           },
           {
             name: item.nome_da_mae || "Não informado", 
-            cpf: item.cpf_mae || "",
+            cpf: (item.cpf_mae && item.cpf_mae !== "null") ? item.cpf_mae : "",
             email: "",
-            phone: item.ddd_mae && item.celular_mae ? `${item.ddd_mae}${item.celular_mae}` : "",
+            phone: (item.ddd_mae && item.celular_mae && item.celular_mae !== "null") ? `${item.ddd_mae}${item.celular_mae}` : "",
             type: "Mãe"
           }
-        ].filter(parent => parent.name !== "Não informado"),
-        selectedParent: null
-      }));
+        ].filter(parent => parent.name !== "Não informado");
+        
+        return {
+          id: parseInt(item.codigo_aluno),
+          name: item.nome_do_aluno,
+          parents: parents,
+          selectedParent: null
+        };
+      });
 
       setSearchResults(mappedResults);
     } catch (error) {
@@ -130,17 +134,12 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   const selectTurmaStudents = async (turma: string) => {
     setIsSearching(true);
     try {
-      console.log('Buscando alunos da turma:', turma);
-      
       const { data: alunosData, error: alunosError } = await supabase
         .from('alunos_comunicados_whatsapp')
         .select('*')
         .eq('turma', turma);
 
-      console.log('Dados dos alunos:', { alunosData, alunosError });
-
       if (alunosError || !alunosData) {
-        console.error('Erro ao buscar alunos:', alunosError);
         toast({
           title: "Erro",
           description: "Não foi possível buscar dados dos alunos.",
@@ -151,35 +150,40 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
 
       const mappedStudents: Student[] = alunosData
         .filter((item: any) => !selectedStudents.some(selected => selected.id.toString() === item.codigo_aluno))
-        .map((item: any) => ({
-          id: parseInt(item.codigo_aluno),
-          name: item.nome_do_aluno,
-          parents: [
+        .map((item: any) => {
+          const parents = [
             {
               name: item.nome_pai || "Não informado",
-              cpf: item.cpf_pai || "",
+              cpf: (item.cpf_pai && item.cpf_pai !== "null") ? item.cpf_pai : "",
               email: "",
-              phone: item.ddd_pai && item.celular_pai ? `${item.ddd_pai}${item.celular_pai}` : "",
+              phone: (item.ddd_pai && item.celular_pai && item.celular_pai !== "null") ? `${item.ddd_pai}${item.celular_pai}` : "",
               type: "Pai"
             },
             {
               name: item.nome_da_mae || "Não informado",
-              cpf: item.cpf_mae || "",
+              cpf: (item.cpf_mae && item.cpf_mae !== "null") ? item.cpf_mae : "",
               email: "",
-              phone: item.ddd_mae && item.celular_mae ? `${item.ddd_mae}${item.celular_mae}` : "",
+              phone: (item.ddd_mae && item.celular_mae && item.celular_mae !== "null") ? `${item.ddd_mae}${item.celular_mae}` : "",
               type: "Mãe"
             }
-          ].filter(parent => parent.name !== "Não informado"),
-          selectedParent: null
-        }));
-
-      console.log('Alunos mapeados:', mappedStudents);
+          ].filter(parent => parent.name !== "Não informado");
+          
+          // Ao selecionar turma completa, auto-seleciona o primeiro responsável válido
+          const firstValidParent = parents.length > 0 ? parents[0] : null;
+          
+          return {
+            id: parseInt(item.codigo_aluno),
+            name: item.nome_do_aluno,
+            parents: parents,
+            selectedParent: firstValidParent
+          };
+        });
 
       mappedStudents.forEach(student => onStudentSelect(student));
       
       toast({
         title: "Turma adicionada",
-        description: `${mappedStudents.length} alunos da turma ${turma} foram adicionados.`,
+        description: `${mappedStudents.length} alunos da turma ${turma} foram adicionados com responsáveis selecionados automaticamente.`,
       });
     } catch (error) {
       console.error('Erro ao buscar turma:', error);

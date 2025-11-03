@@ -284,10 +284,10 @@ export const ContractEditor = () => {
                   <FileText className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">
-                      Próximo passo
+                      Ação necessária
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Selecione um responsável (Pai ou Mãe) para cada aluno antes de continuar para as abas de Ocorrências e Atas.
+                      Alguns alunos ainda não têm um responsável selecionado. Selecione um responsável (Pai ou Mãe) para cada aluno antes de continuar.
                     </p>
                   </div>
                 </div>
