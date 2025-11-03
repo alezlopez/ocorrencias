@@ -107,6 +107,39 @@ export type Database = {
         }
         Relationships: []
       }
+      interessados_matricula: {
+        Row: {
+          created_at: string
+          escola_atual: string | null
+          follow_up: boolean | null
+          id: number
+          nome_responsavel: string | null
+          serie_interesse: string | null
+          telefone_responsavel: string | null
+          turno_interesse: string | null
+        }
+        Insert: {
+          created_at?: string
+          escola_atual?: string | null
+          follow_up?: boolean | null
+          id?: number
+          nome_responsavel?: string | null
+          serie_interesse?: string | null
+          telefone_responsavel?: string | null
+          turno_interesse?: string | null
+        }
+        Update: {
+          created_at?: string
+          escola_atual?: string | null
+          follow_up?: boolean | null
+          id?: number
+          nome_responsavel?: string | null
+          serie_interesse?: string | null
+          telefone_responsavel?: string | null
+          turno_interesse?: string | null
+        }
+        Relationships: []
+      }
       numeros_da_sorte: {
         Row: {
           Aluno: string | null
@@ -133,97 +166,40 @@ export type Database = {
       }
       ocorrencias: {
         Row: {
-          Bairro: string | null
-          CEP: string | null
-          Ciclo: string | null
-          Cidade: string | null
           "Cod Aluno": number
           "CPF da mãe": string | null
           "CPF do Pai": string | null
-          "Curso 2025": string | null
-          "Curso 2026": string | null
-          "Data Nascimento Aluno": string | null
-          "Data Nascimento Resp. Financeiro": string | null
-          data_rematricula: string | null
-          Desconto: string | null
           "Email da Mãe": string | null
           "Email do Pai": string | null
-          Endereço: string | null
-          Estado: string | null
-          "Estado Civil Resp. Financeiro": string | null
-          forma_de_pagamento: string | null
-          "Naturalidade do Responsável Financeiro": string | null
           "Nome da mãe": string | null
           "Nome do Aluno": string | null
           "Nome do Pai": string | null
-          Número: number | null
-          "Profissão Resp. Financeiro": string | null
-          "RG Resp. Financeiro": string | null
           "Telefone da Mãe": string | null
           "Telefone do Pai": string | null
-          "Turno 2026": string | null
         }
         Insert: {
-          Bairro?: string | null
-          CEP?: string | null
-          Ciclo?: string | null
-          Cidade?: string | null
           "Cod Aluno": number
           "CPF da mãe"?: string | null
           "CPF do Pai"?: string | null
-          "Curso 2025"?: string | null
-          "Curso 2026"?: string | null
-          "Data Nascimento Aluno"?: string | null
-          "Data Nascimento Resp. Financeiro"?: string | null
-          data_rematricula?: string | null
-          Desconto?: string | null
           "Email da Mãe"?: string | null
           "Email do Pai"?: string | null
-          Endereço?: string | null
-          Estado?: string | null
-          "Estado Civil Resp. Financeiro"?: string | null
-          forma_de_pagamento?: string | null
-          "Naturalidade do Responsável Financeiro"?: string | null
           "Nome da mãe"?: string | null
           "Nome do Aluno"?: string | null
           "Nome do Pai"?: string | null
-          Número?: number | null
-          "Profissão Resp. Financeiro"?: string | null
-          "RG Resp. Financeiro"?: string | null
           "Telefone da Mãe"?: string | null
           "Telefone do Pai"?: string | null
-          "Turno 2026"?: string | null
         }
         Update: {
-          Bairro?: string | null
-          CEP?: string | null
-          Ciclo?: string | null
-          Cidade?: string | null
           "Cod Aluno"?: number
           "CPF da mãe"?: string | null
           "CPF do Pai"?: string | null
-          "Curso 2025"?: string | null
-          "Curso 2026"?: string | null
-          "Data Nascimento Aluno"?: string | null
-          "Data Nascimento Resp. Financeiro"?: string | null
-          data_rematricula?: string | null
-          Desconto?: string | null
           "Email da Mãe"?: string | null
           "Email do Pai"?: string | null
-          Endereço?: string | null
-          Estado?: string | null
-          "Estado Civil Resp. Financeiro"?: string | null
-          forma_de_pagamento?: string | null
-          "Naturalidade do Responsável Financeiro"?: string | null
           "Nome da mãe"?: string | null
           "Nome do Aluno"?: string | null
           "Nome do Pai"?: string | null
-          Número?: number | null
-          "Profissão Resp. Financeiro"?: string | null
-          "RG Resp. Financeiro"?: string | null
           "Telefone da Mãe"?: string | null
           "Telefone do Pai"?: string | null
-          "Turno 2026"?: string | null
         }
         Relationships: []
       }
@@ -675,6 +651,36 @@ export type Database = {
         }
         Relationships: []
       }
+      vagas_turmas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          curso: string
+          id: number
+          max_vagas: number
+          turno: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          curso: string
+          id?: number
+          max_vagas: number
+          turno: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          curso?: string
+          id?: number
+          max_vagas?: number
+          turno?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -689,61 +695,27 @@ export type Database = {
           user_id: string
         }[]
       }
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
+      calcular_vagas_disponiveis: {
+        Args: { p_curso: string; p_turno: string }
+        Returns: {
+          curso: string
+          disponivel: boolean
+          matriculados: number
+          max_vagas: number
+          turno: string
+          vagas_disponiveis: number
+        }[]
       }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
+      get_vagas_disponiveis: {
+        Args: never
+        Returns: {
+          curso: string
+          disponivel: boolean
+          matriculados: number
+          max_vagas: number
+          turno: string
+          vagas_disponiveis: number
+        }[]
       }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
@@ -804,18 +776,6 @@ export type Database = {
           "token contrato": string
           "Turno 2026": string
         }[]
-      }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
       }
       update_rematricula_fields: {
         Args: {
@@ -885,30 +845,12 @@ export type Database = {
           "token contrato": string | null
           "Turno 2026": string | null
         }[]
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
+        SetofOptions: {
+          from: "*"
+          to: "rematricula"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {
