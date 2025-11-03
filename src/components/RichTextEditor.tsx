@@ -50,9 +50,17 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
       span.className = 'bg-primary/10 text-primary px-2 py-1 rounded font-medium';
       span.textContent = variable;
       
+      // Adicionar espaço depois da variável
+      const space = document.createTextNode('\u00A0');
+      
       range.insertNode(span);
       range.setStartAfter(span);
-      range.setEndAfter(span);
+      range.collapse(true);
+      range.insertNode(space);
+      
+      // Posicionar cursor após o espaço
+      range.setStartAfter(space);
+      range.setEndAfter(space);
       selection.removeAllRanges();
       selection.addRange(range);
       
@@ -270,10 +278,13 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           contentEditable
           onInput={handleInput}
           dangerouslySetInnerHTML={{ __html: value }}
-          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none"
+          dir="ltr"
+          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none text-left"
           style={{
             lineHeight: '1.6',
-            fontFamily: 'inherit'
+            fontFamily: 'inherit',
+            direction: 'ltr',
+            textAlign: 'left'
           }}
         />
 
