@@ -2,20 +2,15 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Bold, 
   Italic, 
   Underline, 
-  AlignLeft, 
-  AlignCenter, 
-  AlignRight,
-  List,
-  ListOrdered,
   Type,
   Plus,
   User,
-  UserCheck,
-  Eye
+  UserCheck
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -31,160 +26,77 @@ interface RichTextEditorProps {
 }
 
 export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorProps) => {
-  const editorRef = useRef<HTMLDivElement>(null);
-
-  // Forçar LTR e prevenir auto-detecção
-  React.useEffect(() => {
-    if (editorRef.current) {
-      const editor = editorRef.current;
-      editor.style.direction = 'ltr';
-      editor.style.unicodeBidi = 'plaintext';
-      editor.setAttribute('dir', 'ltr');
-      
-      // Observer para forçar LTR em todos os elementos criados dinamicamente
-      const observer = new MutationObserver(() => {
-        const allElements = editor.querySelectorAll('*');
-        allElements.forEach((el) => {
-          if (el instanceof HTMLElement) {
-            el.removeAttribute('dir');
-            el.style.direction = 'ltr';
-          }
-        });
-      });
-      
-      observer.observe(editor, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['dir']
-      });
-      
-      return () => observer.disconnect();
-    }
-  }, []);
-
-  const executeCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    if (editorRef.current) {
-      // Forçar LTR após comandos
-      const editor = editorRef.current;
-      editor.style.direction = 'ltr';
-      
-      // Remover dir="rtl" de todos os elementos
-      const allElements = editor.querySelectorAll('[dir="rtl"]');
-      allElements.forEach(el => {
-        el.removeAttribute('dir');
-        if (el instanceof HTMLElement) {
-          el.style.direction = 'ltr';
-        }
-      });
-      
-      onChange(editorRef.current.innerHTML);
-    }
-  };
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const insertVariable = (variable: string) => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      
-      const span = document.createElement('span');
-      span.className = 'bg-primary/10 text-primary px-2 py-1 rounded font-medium';
-      span.textContent = variable;
-      
-      // Adicionar espaço depois da variável
-      const space = document.createTextNode('\u00A0');
-      
-      range.insertNode(span);
-      range.setStartAfter(span);
-      range.collapse(true);
-      range.insertNode(space);
-      
-      // Posicionar cursor após o espaço
-      range.setStartAfter(space);
-      range.setEndAfter(space);
-      selection.removeAllRanges();
-      selection.addRange(range);
-      
-      if (editorRef.current) {
-        onChange(editorRef.current.innerHTML);
-      }
-    }
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    const newText = text.substring(0, start) + variable + ' ' + text.substring(end);
+    onChange(newText);
+    
+    // Posicionar cursor após a variável
+    setTimeout(() => {
+      textarea.focus();
+      const newPosition = start + variable.length + 1;
+      textarea.setSelectionRange(newPosition, newPosition);
+    }, 0);
   };
 
-  const handleInput = () => {
-    if (editorRef.current) {
-      const editor = editorRef.current;
-      
-      // Garantir LTR durante digitação
-      editor.style.direction = 'ltr';
-      
-      // Remover qualquer dir="rtl" adicionado pelo navegador
-      const allElements = editor.querySelectorAll('[dir="rtl"]');
-      allElements.forEach(el => {
-        el.removeAttribute('dir');
-        if (el instanceof HTMLElement) {
-          el.style.direction = 'ltr';
-        }
-      });
-      
-      onChange(editor.innerHTML);
-    }
-  };
+  const applyFormatting = (tag: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Prevenir comandos que podem adicionar RTL
-    if (e.ctrlKey || e.metaKey) {
-      if (e.shiftKey && (e.key === 'X' || e.key === 'x')) {
-        // Ctrl+Shift+X pode adicionar RTL em alguns navegadores
-        e.preventDefault();
-      }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) return;
+    
+    let formattedText = '';
+    switch(tag) {
+      case 'bold':
+        formattedText = `<strong>${selectedText}</strong>`;
+        break;
+      case 'italic':
+        formattedText = `<em>${selectedText}</em>`;
+        break;
+      case 'underline':
+        formattedText = `<u>${selectedText}</u>`;
+        break;
+      default:
+        return;
     }
+    
+    const text = textarea.value;
+    const newText = text.substring(0, start) + formattedText + text.substring(end);
+    onChange(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      const newPosition = start + formattedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+    }, 0);
   };
-
-  const fontSizes = [
-    { label: 'Pequeno', value: '1' },
-    { label: 'Normal', value: '3' },
-    { label: 'Grande', value: '5' },
-    { label: 'Muito Grande', value: '7' }
-  ];
 
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Editor de Contrato</CardTitle>
+        <CardTitle className="text-sm">Editor de Documento</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2 p-3 bg-accent rounded-lg">
-          {/* Font Size */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                <Type className="h-4 w-4" />
-                Tamanho
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {fontSizes.map((size) => (
-                <DropdownMenuItem
-                  key={size.value}
-                  onClick={() => executeCommand('fontSize', size.value)}
-                >
-                  {size.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Separator orientation="vertical" className="h-6" />
-
           {/* Formatting */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => executeCommand('bold')}
+            onClick={() => applyFormatting('bold')}
+            title="Negrito (selecione o texto primeiro)"
           >
             <Bold className="h-4 w-4" />
           </Button>
@@ -192,7 +104,8 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => executeCommand('italic')}
+            onClick={() => applyFormatting('italic')}
+            title="Itálico (selecione o texto primeiro)"
           >
             <Italic className="h-4 w-4" />
           </Button>
@@ -200,55 +113,10 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => executeCommand('underline')}
+            onClick={() => applyFormatting('underline')}
+            title="Sublinhado (selecione o texto primeiro)"
           >
             <Underline className="h-4 w-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-6" />
-
-          {/* Alignment */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => executeCommand('justifyLeft')}
-          >
-            <AlignLeft className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => executeCommand('justifyCenter')}
-          >
-            <AlignCenter className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => executeCommand('justifyRight')}
-          >
-            <AlignRight className="h-4 w-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-6" />
-
-          {/* Lists */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => executeCommand('insertUnorderedList')}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => executeCommand('insertOrderedList')}
-          >
-            <ListOrdered className="h-4 w-4" />
           </Button>
 
           <Separator orientation="vertical" className="h-6" />
@@ -320,47 +188,27 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {onPreview && (
-            <>
-              <Separator orientation="vertical" className="h-6" />
-              
-              {/* Preview Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onPreview}
-                className="flex items-center gap-1"
-              >
-                <Eye className="h-4 w-4" />
-                Preview
-              </Button>
-            </>
-          )}
         </div>
 
-        {/* Editor */}
-        <div
-          ref={editorRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          dangerouslySetInnerHTML={{ __html: value }}
+        {/* Editor - Textarea simples */}
+        <Textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Digite o texto do documento aqui. Use os botões acima para inserir variáveis."
+          className="min-h-[400px] font-sans text-base leading-relaxed"
           dir="ltr"
-          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none [&_*]:!direction-ltr"
-          style={{
-            lineHeight: '1.6',
-            fontFamily: 'inherit',
-            direction: 'ltr',
-            textAlign: 'left',
-            unicodeBidi: 'plaintext'
-          }}
+          style={{ direction: 'ltr', textAlign: 'left' }}
         />
 
         {/* Help Text */}
         <div className="text-xs text-muted-foreground bg-accent/50 p-3 rounded">
-          <p className="font-medium mb-1">Variáveis disponíveis:</p>
+          <p className="font-medium mb-2">Como usar:</p>
+          <ul className="space-y-1 list-disc list-inside">
+            <li><strong>Formatação:</strong> Selecione o texto e clique em Negrito, Itálico ou Sublinhado</li>
+            <li><strong>Variáveis:</strong> Clique no botão "Variáveis" para inserir dados dinâmicos</li>
+          </ul>
+          <p className="font-medium mt-3 mb-1">Variáveis disponíveis:</p>
           <div className="grid grid-cols-2 gap-1">
             <p><code className="bg-background px-1 rounded">{'{{NOME_ALUNO}}'}</code> - Nome do aluno</p>
             <p><code className="bg-background px-1 rounded">{'{{NOME_PAI}}'}</code> - Nome do pai</p>

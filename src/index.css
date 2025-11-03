@@ -117,13 +117,4 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
-
-  /* Forçar LTR em editor contentEditable */
-  [contenteditable] {
-    direction: ltr !important;
-  }
-  
-  [contenteditable] * {
-    direction: ltr !important;
-  }
 }
