@@ -1,23 +1,15 @@
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Bold, 
-  Italic, 
-  Underline, 
-  Type,
-  Plus,
-  User,
-  UserCheck
-} from 'lucide-react';
+import React, { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Bold, Italic, Underline, Type, Plus, User, UserCheck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 
 interface RichTextEditorProps {
   value: string;
@@ -35,10 +27,10 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = textarea.value;
-    
-    const newText = text.substring(0, start) + variable + ' ' + text.substring(end);
+
+    const newText = text.substring(0, start) + variable + " " + text.substring(end);
     onChange(newText);
-    
+
     // Posicionar cursor após a variável
     setTimeout(() => {
       textarea.focus();
@@ -54,28 +46,28 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = textarea.value.substring(start, end);
-    
+
     if (!selectedText) return;
-    
-    let formattedText = '';
-    switch(tag) {
-      case 'bold':
-        formattedText = `<strong>${selectedText}</strong>`;
+
+    let formattedText = "";
+    switch (tag) {
+      case "bold":
+        formattedText = `*${selectedText}*`;
         break;
-      case 'italic':
-        formattedText = `<em>${selectedText}</em>`;
+      case "italic":
+        formattedText = `_${selectedText}_`;
         break;
-      case 'underline':
-        formattedText = `<u>${selectedText}</u>`;
+      case "underline":
+        formattedText = `~${selectedText}~`;
         break;
       default:
         return;
     }
-    
+
     const text = textarea.value;
     const newText = text.substring(0, start) + formattedText + text.substring(end);
     onChange(newText);
-    
+
     setTimeout(() => {
       textarea.focus();
       const newPosition = start + formattedText.length;
@@ -86,7 +78,7 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Editor de Documento</CardTitle>
+        <CardTitle className="text-sm">Editor de texto</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Toolbar */}
@@ -95,25 +87,25 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => applyFormatting('bold')}
+            onClick={() => applyFormatting("bold")}
             title="Negrito (selecione o texto primeiro)"
           >
             <Bold className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => applyFormatting('italic')}
+            onClick={() => applyFormatting("italic")}
             title="Itálico (selecione o texto primeiro)"
           >
             <Italic className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => applyFormatting('underline')}
+            onClick={() => applyFormatting("underline")}
             title="Sublinhado (selecione o texto primeiro)"
           >
             <Underline className="h-4 w-4" />
@@ -130,59 +122,20 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-background z-50">
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{NOME_ALUNO}}')}
-                className="flex items-center gap-2"
-              >
+              <DropdownMenuItem onClick={() => insertVariable("{{NOME_ALUNO}}")} className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Nome do Aluno
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{NOME_PAI}}')}
-                className="flex items-center gap-2"
-              >
+              <DropdownMenuItem onClick={() => insertVariable("{{NOME_PAI}}")} className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Nome do Pai
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{NOME_MAE}}')}
-                className="flex items-center gap-2"
-              >
+              <DropdownMenuItem onClick={() => insertVariable("{{NOME_MAE}}")} className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Nome da Mãe
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{NOME_RESPONSAVEL}}')}
-                className="flex items-center gap-2"
-              >
-                <UserCheck className="h-4 w-4" />
-                Nome do Responsável
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{CPF_RESPONSAVEL}}')}
-                className="flex items-center gap-2"
-              >
-                <UserCheck className="h-4 w-4" />
-                CPF do Responsável
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{TELEFONE_RESPONSAVEL}}')}
-                className="flex items-center gap-2"
-              >
-                <UserCheck className="h-4 w-4" />
-                Telefone do Responsável
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{EMAIL_RESPONSAVEL}}')}
-                className="flex items-center gap-2"
-              >
-                <UserCheck className="h-4 w-4" />
-                Email do Responsável
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => insertVariable('{{DATA_HOJE}}')}
-                className="flex items-center gap-2"
-              >
+
+              <DropdownMenuItem onClick={() => insertVariable("{{DATA_HOJE}}")} className="flex items-center gap-2">
                 <UserCheck className="h-4 w-4" />
                 Data de Hoje
               </DropdownMenuItem>
@@ -195,29 +148,34 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Digite o texto do documento aqui. Use os botões acima para inserir variáveis."
+          placeholder="Digite o texto do documento aqui. Se necessário, use os botões acima para inserir variáveis."
           className="min-h-[400px] font-sans text-base leading-relaxed"
           dir="ltr"
-          style={{ direction: 'ltr', textAlign: 'left' }}
+          style={{ direction: "ltr", textAlign: "left" }}
         />
 
         {/* Help Text */}
         <div className="text-xs text-muted-foreground bg-accent/50 p-3 rounded">
           <p className="font-medium mb-2">Como usar:</p>
           <ul className="space-y-1 list-disc list-inside">
-            <li><strong>Formatação:</strong> Selecione o texto e clique em Negrito, Itálico ou Sublinhado</li>
-            <li><strong>Variáveis:</strong> Clique no botão "Variáveis" para inserir dados dinâmicos</li>
+            <li>
+              <strong>Formatação:</strong> Selecione o texto e clique em Negrito, Itálico ou Sublinhado
+            </li>
+            <li>
+              <strong>Variáveis:</strong> Clique no botão "Variáveis" para inserir dados dinâmicos
+            </li>
           </ul>
           <p className="font-medium mt-3 mb-1">Variáveis disponíveis:</p>
           <div className="grid grid-cols-2 gap-1">
-            <p><code className="bg-background px-1 rounded">{'{{NOME_ALUNO}}'}</code> - Nome do aluno</p>
-            <p><code className="bg-background px-1 rounded">{'{{NOME_PAI}}'}</code> - Nome do pai</p>
-            <p><code className="bg-background px-1 rounded">{'{{NOME_MAE}}'}</code> - Nome da mãe</p>
-            <p><code className="bg-background px-1 rounded">{'{{NOME_RESPONSAVEL}}'}</code> - Nome do responsável</p>
-            <p><code className="bg-background px-1 rounded">{'{{CPF_RESPONSAVEL}}'}</code> - CPF do responsável</p>
-            <p><code className="bg-background px-1 rounded">{'{{TELEFONE_RESPONSAVEL}}'}</code> - Telefone</p>
-            <p><code className="bg-background px-1 rounded">{'{{EMAIL_RESPONSAVEL}}'}</code> - Email</p>
-            <p><code className="bg-background px-1 rounded">{'{{DATA_HOJE}}'}</code> - Data atual</p>
+            <p>
+              <code className="bg-background px-1 rounded">{"{{NOME_ALUNO}}"}</code> - Nome do aluno
+            </p>
+            <p>
+              <code className="bg-background px-1 rounded">{"{{NOME_PAI}}"}</code> - Nome do pai
+            </p>
+            <p>
+              <code className="bg-background px-1 rounded">{"{{NOME_MAE}}"}</code> - Nome da mãe
+            </p>
           </div>
         </div>
       </CardContent>
