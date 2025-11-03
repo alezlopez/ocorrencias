@@ -33,9 +33,20 @@ interface RichTextEditorProps {
 export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
+  // Forçar LTR ao montar o componente
+  React.useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.style.direction = 'ltr';
+      editorRef.current.style.unicodeBidi = 'embed';
+      editorRef.current.setAttribute('dir', 'ltr');
+    }
+  }, []);
+
   const executeCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     if (editorRef.current) {
+      // Garantir que a direção continue LTR após comandos
+      editorRef.current.style.direction = 'ltr';
       onChange(editorRef.current.innerHTML);
     }
   };
@@ -72,6 +83,8 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
 
   const handleInput = () => {
     if (editorRef.current) {
+      // Garantir que a direção continue LTR durante a digitação
+      editorRef.current.style.direction = 'ltr';
       onChange(editorRef.current.innerHTML);
     }
   };
@@ -279,12 +292,14 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           onInput={handleInput}
           dangerouslySetInnerHTML={{ __html: value }}
           dir="ltr"
-          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none text-left"
+          className="min-h-[400px] p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 prose prose-sm max-w-none"
           style={{
             lineHeight: '1.6',
             fontFamily: 'inherit',
             direction: 'ltr',
-            textAlign: 'left'
+            textAlign: 'left',
+            unicodeBidi: 'embed',
+            writingMode: 'horizontal-tb'
           }}
         />
 
