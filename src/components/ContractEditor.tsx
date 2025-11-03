@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Send } from 'lucide-react';
+import { FileText, Send, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
 import { ContractPreview } from './ContractPreview';
@@ -44,8 +47,10 @@ export const ContractEditor = () => {
 
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [documentType, setDocumentType] = useState<'ocorrencias' | 'atas' | null>(null);
+  const [documentType, setDocumentType] = useState<'ocorrencias' | 'atas' | 'diversos' | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [diversosText, setDiversosText] = useState('');
+  const [diversosFiles, setDiversosFiles] = useState<File[]>([]);
 
   const handleTemplateSelect = (template: ContractTemplate) => {
     setSelectedTemplate(template.id);
@@ -231,9 +236,91 @@ export const ContractEditor = () => {
         /\{\{EMAIL_RESPONSAVEL\}\}/g, 
         selectedParent.email || '[Email do Responsável]'
       );
+      
+      // Variáveis adicionais para "Diversos"
+      const nomePai = student.parents.find(p => p.type === 'Pai')?.name || '[Nome do Pai]';
+      const nomeMae = student.parents.find(p => p.type === 'Mãe')?.name || '[Nome da Mãe]';
+      
+      processedContent = processedContent.replace(
+        /\{\{NOME_PAI\}\}/g, 
+        nomePai
+      );
+      processedContent = processedContent.replace(
+        /\{\{NOME_MAE\}\}/g, 
+        nomeMae
+      );
     }
     
     return processedContent;
+  };
+
+  const handleSendDiversos = async () => {
+    if (!diversosText.trim()) {
+      toast({
+        title: "Texto não preenchido",
+        description: "Por favor, preencha o texto do documento.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedStudents.length === 0) {
+      toast({
+        title: "Nenhum aluno selecionado",
+        description: "Selecione pelo menos um aluno para envio.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: "Processando...",
+        description: "Enviando documentos diversos...",
+      });
+
+      for (const student of selectedStudents) {
+        const processedText = replaceVariables(diversosText, student);
+        
+        const formData = new FormData();
+        formData.append('texto', processedText);
+        formData.append('nomeAluno', student.name);
+        formData.append('nomeResponsavel', student.selectedParent?.name || '');
+        formData.append('cpfResponsavel', student.selectedParent?.cpf || '');
+        formData.append('whatsapp', student.selectedParent?.phone || '');
+        
+        // Adicionar arquivos ao FormData
+        diversosFiles.forEach((file, index) => {
+          formData.append(`arquivo_${index}`, file);
+        });
+
+        const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro ao enviar documento para ${student.name}`);
+        }
+      }
+
+      toast({
+        title: "Documentos enviados!",
+        description: `Documentos enviados para ${selectedStudents.length} aluno(s)!`,
+      });
+
+      // Limpar campos
+      setDiversosText('');
+      setDiversosFiles([]);
+
+    } catch (error) {
+      console.error('Erro ao enviar documentos diversos:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao enviar documentos. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -319,6 +406,12 @@ export const ContractEditor = () => {
                     >
                       Atas
                     </Button>
+                    <Button
+                      variant={documentType === 'diversos' ? 'default' : 'outline'}
+                      onClick={() => { setDocumentType('diversos'); setSelectedTemplate(null); }}
+                    >
+                      Diversos
+                    </Button>
                   </div>
                   {documentType === 'atas' && (
                     <p className="text-sm text-muted-foreground mt-3">
@@ -342,6 +435,71 @@ export const ContractEditor = () => {
                       selectedTemplate={selectedTemplate}
                       onTemplateSelect={handleTemplateSelect}
                     />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Formulário Diversos */}
+              {documentType === 'diversos' && (
+                <Card className="shadow-card animate-slide-up">
+                  <CardHeader className="bg-gradient-card rounded-t-lg">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      3. Preencher Documento Diversos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <Label htmlFor="diversosText" className="mb-2 block">
+                        Texto do Documento
+                      </Label>
+                      <Textarea
+                        id="diversosText"
+                        placeholder="Digite o texto do documento aqui. Use as variáveis: {{NOME_ALUNO}}, {{NOME_PAI}}, {{NOME_MAE}}, {{NOME_RESPONSAVEL}}"
+                        value={diversosText}
+                        onChange={(e) => setDiversosText(e.target.value)}
+                        rows={8}
+                        className="w-full"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        <strong>Variáveis disponíveis:</strong> {'{{NOME_ALUNO}}'}, {'{{NOME_PAI}}'}, {'{{NOME_MAE}}'}, {'{{NOME_RESPONSAVEL}}'}, {'{{CPF_RESPONSAVEL}}'}, {'{{TELEFONE_RESPONSAVEL}}'}, {'{{EMAIL_RESPONSAVEL}}'}, {'{{DATA_HOJE}}'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="diversosFiles" className="mb-2 block">
+                        Anexar Documentos (opcional)
+                      </Label>
+                      <Input
+                        id="diversosFiles"
+                        type="file"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          setDiversosFiles(files);
+                        }}
+                        className="w-full"
+                      />
+                      {diversosFiles.length > 0 && (
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          <strong>Arquivos selecionados:</strong>
+                          <ul className="list-disc list-inside mt-1">
+                            {diversosFiles.map((file, index) => (
+                              <li key={index}>{file.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    <Button 
+                      size="lg"
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-primary hover:opacity-90 transition-smooth"
+                      onClick={handleSendDiversos}
+                    >
+                      <Send className="h-4 w-4" />
+                      Enviar Documentos Diversos
+                    </Button>
                   </CardContent>
                 </Card>
               )}
