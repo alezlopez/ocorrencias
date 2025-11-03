@@ -104,86 +104,79 @@ export const ContractEditor = () => {
         description: "Gerando documentos e enviando para assinatura...",
       });
 
-      for (let i = 0; i < selectedStudents.length; i++) {
-        const student = selectedStudents[i];
-        const processedContent = replaceVariables(contractData.content, student);
-        
-        // Gerar PDF em base64
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = `
-          <div style="
-            width: 210mm;
-            min-height: 297mm;
-            background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 5cm 1.27cm 3.3cm 1.27cm;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.5;
-            color: black;
-          ">
-            ${processedContent}
-          </div>
-        `;
-        
-        const options = {
-          margin: 0,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        
-        const pdfBlob = await html2pdf().set(options).from(tempElement).outputPdf('blob');
-        
-        // Converter para base64
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64String = reader.result as string;
-            resolve(base64String.split(',')[1]); // Remove o prefixo "data:..."
+      // Preparar array com todos os alunos e seus PDFs
+      const alunos = await Promise.all(
+        selectedStudents.map(async (student) => {
+          const processedContent = replaceVariables(contractData.content, student);
+          
+          // Gerar PDF em base64
+          const tempElement = document.createElement('div');
+          tempElement.innerHTML = `
+            <div style="
+              width: 210mm;
+              min-height: 297mm;
+              background-image: url(/lovable-uploads/64a6e884-bff1-48e8-af2e-8d05186bf824.png);
+              background-size: cover;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 5cm 1.27cm 3.3cm 1.27cm;
+              box-sizing: border-box;
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              line-height: 1.5;
+              color: black;
+            ">
+              ${processedContent}
+            </div>
+          `;
+          
+          const options = {
+            margin: 0,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
           };
-          reader.readAsDataURL(pdfBlob);
-        });
+          
+          const pdfBlob = await html2pdf().set(options).from(tempElement).outputPdf('blob');
+          
+          // Converter para base64
+          const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64String = reader.result as string;
+              resolve(base64String.split(',')[1]);
+            };
+            reader.readAsDataURL(pdfBlob);
+          });
 
-        // Preparar dados para envio
-        const selectedParent = student.selectedParent;
-        const nomeResponsavel = selectedParent ? selectedParent.name : '[Nome do Responsável]';
-        const cpfResponsavel = selectedParent ? selectedParent.cpf : '[CPF do Responsável]';
-        
-        const webhookData = {
-          nomeResponsavel,
-          cpfResponsavel,
-          whatsapp: selectedParent ? selectedParent.phone : '[WhatsApp não informado]',
-          base64,
-          nomeAluno: student.name
-        };
+          const selectedParent = student.selectedParent;
+          
+          return {
+            nomeResponsavel: selectedParent ? selectedParent.name : '[Nome do Responsável]',
+            cpfResponsavel: selectedParent ? selectedParent.cpf : '[CPF do Responsável]',
+            whatsapp: selectedParent ? selectedParent.phone : '[WhatsApp não informado]',
+            base64,
+            nomeAluno: student.name
+          };
+        })
+      );
 
-        // Enviar para a edge function
-        const { data, error } = await supabase.functions.invoke('send-to-zapsign', {
-          body: webhookData
-        });
+      // Enviar todos os alunos em uma única chamada
+      const { data, error } = await supabase.functions.invoke('send-to-zapsign', {
+        body: { alunos }
+      });
 
-        if (error) {
-          console.error('Erro ao enviar para ZapSign:', error);
-          throw new Error(`Erro ao enviar documento para ${student.name}: ${error.message}`);
-        }
-
-        // Verificar se houve erro na resposta da edge function
-        if (data && !data.success) {
-          console.error('Webhook retornou erro:', data);
-          throw new Error(`Erro ao enviar documento para ${student.name}: ${data.error}`);
-        }
-
-        console.log(`Documento enviado com sucesso para ${student.name}:`, data);
-
-        // Aguardar entre envios para não sobrecarregar
-        if (i < selectedStudents.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+      if (error) {
+        console.error('Erro ao enviar para ZapSign:', error);
+        throw new Error(`Erro ao enviar documentos: ${error.message}`);
       }
+
+      if (data && !data.success) {
+        console.error('Webhook retornou erro:', data);
+        throw new Error(`Erro ao enviar documentos: ${data.error}`);
+      }
+
+      console.log('Documentos enviados com sucesso:', data);
 
       const message = selectedStudents.length > 1 
         ? `Documentos enviados para ${selectedStudents.length} responsáveis!`
