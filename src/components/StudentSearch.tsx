@@ -168,8 +168,10 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             }
           ].filter(parent => parent.name !== "Não informado");
           
-          // Ao selecionar turma completa, auto-seleciona o primeiro responsável válido
-          const firstValidParent = parents.length > 0 ? parents[0] : null;
+          // Prioriza Mãe, só usa Pai se Mãe não tiver telefone
+          const mae = parents.find(p => p.type === "Mãe");
+          const pai = parents.find(p => p.type === "Pai");
+          const firstValidParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : (mae || pai || null);
           
           return {
             id: parseInt(item.codigo_aluno),
