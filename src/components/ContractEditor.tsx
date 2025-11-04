@@ -358,10 +358,10 @@ export const ContractEditor = () => {
             />
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">
-                Envio de Documentos para Assinatura
+                Envio de Ocorrências, Atas e Comunicados diversos. 
               </h1>
               <p className="text-muted-foreground text-lg">
-                Selecione o aluno, defina o tipo e escolha o modelo
+                Selecione o aluno, defina o tipo e escolha o modelo.
               </p>
             </div>
           </div>
