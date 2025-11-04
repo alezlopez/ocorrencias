@@ -3,11 +3,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { Search, X, User, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Student {
   id: number;
@@ -41,7 +41,7 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   const [isSearching, setIsSearching] = useState(false);
   const [selectionType, setSelectionType] = useState<'individual' | 'turma'>('individual');
   const [turmas, setTurmas] = useState<string[]>([]);
-  const [selectedTurma, setSelectedTurma] = useState<string>('');
+  const [selectedTurmas, setSelectedTurmas] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchTurmas = async () => {
@@ -265,21 +265,47 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
 
         <TabsContent value="turma" className="mt-4">
           <div className="space-y-3">
-            <Select value={selectedTurma} onValueChange={(turma) => {
-              setSelectedTurma(turma);
-              selectTurmaStudents(turma);
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma turma..." />
-              </SelectTrigger>
-              <SelectContent>
+            <div className="p-4 border rounded-lg bg-card">
+              <Label className="text-sm font-medium mb-3 block">Selecione uma ou mais turmas:</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
                 {turmas.map((turma) => (
-                  <SelectItem key={turma} value={turma}>
-                    {turma}
-                  </SelectItem>
+                  <div key={turma} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`turma-${turma}`}
+                      checked={selectedTurmas.includes(turma)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTurmas(prev => [...prev, turma]);
+                        } else {
+                          setSelectedTurmas(prev => prev.filter(t => t !== turma));
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <label
+                      htmlFor={`turma-${turma}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {turma}
+                    </label>
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+              {selectedTurmas.length > 0 && (
+                <Button 
+                  onClick={async () => {
+                    for (const turma of selectedTurmas) {
+                      await selectTurmaStudents(turma);
+                    }
+                    setSelectedTurmas([]);
+                  }}
+                  className="mt-4 w-full"
+                >
+                  Adicionar {selectedTurmas.length} turma(s) selecionada(s)
+                </Button>
+              )}
+            </div>
           </div>
         </TabsContent>
       </Tabs>

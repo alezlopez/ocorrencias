@@ -187,6 +187,11 @@ export const ContractEditor = () => {
         description: message,
       });
 
+      // Limpar seleções após envio
+      setSelectedStudents([]);
+      setSelectedTemplate(null);
+      setDocumentType(null);
+
     } catch (error) {
       console.error('Erro ao enviar documentos:', error);
       toast({
@@ -332,9 +337,11 @@ export const ContractEditor = () => {
         description: `Documentos enviados para ${selectedStudents.length} aluno(s)!`,
       });
 
-      // Limpar campos
+      // Limpar campos após envio
       setDiversosText('');
       setDiversosFiles([]);
+      setSelectedStudents([]);
+      setDocumentType(null);
 
     } catch (error) {
       console.error('Erro ao enviar documentos diversos:', error);
