@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      alunnos_26: {
+        Row: {
+          celular_pai: string | null
+          codigo_aluno: string | null
+          cpf_mae: string | null
+          cpf_pai: string | null
+          created_at: string
+          curso: string | null
+          id: number
+          nome_aluno: string | null
+          nome_mae: string | null
+          nome_pai: string | null
+          telefone_mae: string | null
+        }
+        Insert: {
+          celular_pai?: string | null
+          codigo_aluno?: string | null
+          cpf_mae?: string | null
+          cpf_pai?: string | null
+          created_at?: string
+          curso?: string | null
+          id?: number
+          nome_aluno?: string | null
+          nome_mae?: string | null
+          nome_pai?: string | null
+          telefone_mae?: string | null
+        }
+        Update: {
+          celular_pai?: string | null
+          codigo_aluno?: string | null
+          cpf_mae?: string | null
+          cpf_pai?: string | null
+          created_at?: string
+          curso?: string | null
+          id?: number
+          nome_aluno?: string | null
+          nome_mae?: string | null
+          nome_pai?: string | null
+          telefone_mae?: string | null
+        }
+        Relationships: []
+      }
       alunos_comunicados_whatsapp: {
         Row: {
           celular_mae: string | null
@@ -182,6 +224,36 @@ export type Database = {
           serie_interesse?: string | null
           telefone_responsavel?: string | null
           turno_interesse?: string | null
+        }
+        Relationships: []
+      }
+      lista_vip: {
+        Row: {
+          cpf_responsavel: string
+          created_at: string
+          id: number
+          nome_aluno: string
+          nome_responsavel: string
+          serie_aluno: string
+          whatsapp_responsavel: string
+        }
+        Insert: {
+          cpf_responsavel: string
+          created_at?: string
+          id?: never
+          nome_aluno: string
+          nome_responsavel: string
+          serie_aluno: string
+          whatsapp_responsavel: string
+        }
+        Update: {
+          cpf_responsavel?: string
+          created_at?: string
+          id?: never
+          nome_aluno?: string
+          nome_responsavel?: string
+          serie_aluno?: string
+          whatsapp_responsavel?: string
         }
         Relationships: []
       }
