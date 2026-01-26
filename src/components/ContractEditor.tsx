@@ -48,7 +48,7 @@ export const ContractEditor = () => {
 
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [documentType, setDocumentType] = useState<'ocorrencias' | 'atas' | 'diversos' | null>(null);
+  const [documentType, setDocumentType] = useState<'ocorrencias' | 'diversos' | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [diversosText, setDiversosText] = useState('');
   const [diversosFiles, setDiversosFiles] = useState<File[]>([]);
@@ -431,23 +431,12 @@ export const ContractEditor = () => {
                       Ocorrências
                     </Button>
                     <Button
-                      variant={documentType === 'atas' ? 'default' : 'outline'}
-                      onClick={() => { setDocumentType('atas'); setSelectedTemplate(null); }}
-                    >
-                      Atas
-                    </Button>
-                    <Button
                       variant={documentType === 'diversos' ? 'default' : 'outline'}
                       onClick={() => { setDocumentType('diversos'); setSelectedTemplate(null); }}
                     >
                       Diversos
                     </Button>
                   </div>
-                  {documentType === 'atas' && (
-                    <p className="text-sm text-muted-foreground mt-3">
-                      Modelos de Atas: confirme se devemos usar modelos pré-definidos ou outra forma de envio.
-                    </p>
-                  )}
                 </CardContent>
               </Card>
 
