@@ -46,12 +46,12 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   useEffect(() => {
     const fetchTurmas = async () => {
       const { data, error } = await supabase
-        .from('alunos_comunicados_whatsapp')
-        .select('turma')
-        .order('turma');
+        .from('alunos_26')
+        .select('curso')
+        .order('curso');
       
       if (!error && data) {
-        const uniqueTurmas = [...new Set(data.map(item => item.turma).filter(Boolean))] as string[];
+        const uniqueTurmas = [...new Set(data.map(item => item.curso).filter(Boolean))] as string[];
         setTurmas(uniqueTurmas);
       }
     };
@@ -68,9 +68,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('alunos_comunicados_whatsapp')
+        .from('alunos_26')
         .select('*')
-        .ilike('nome_do_aluno', `%${term}%`)
+        .ilike('nome_aluno', `%${term}%`)
         .limit(10);
 
       if (error) {
@@ -98,21 +98,21 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             name: item.nome_pai || "Não informado",
             cpf: (item.cpf_pai && item.cpf_pai !== "null") ? item.cpf_pai : "",
             email: "",
-            phone: (item.ddd_pai && item.celular_pai && item.celular_pai !== "null") ? `${item.ddd_pai}${item.celular_pai}` : "",
+            phone: (item.celular_pai && item.celular_pai !== "null") ? item.celular_pai : "",
             type: "Pai"
           },
           {
-            name: item.nome_da_mae || "Não informado", 
+            name: item.nome_mae || "Não informado", 
             cpf: (item.cpf_mae && item.cpf_mae !== "null") ? item.cpf_mae : "",
             email: "",
-            phone: (item.ddd_mae && item.celular_mae && item.celular_mae !== "null") ? `${item.ddd_mae}${item.celular_mae}` : "",
+            phone: (item.telefone_mae && item.telefone_mae !== "null") ? item.telefone_mae : "",
             type: "Mãe"
           }
         ].filter(parent => parent.name !== "Não informado");
         
         return {
           id: parseInt(item.codigo_aluno),
-          name: item.nome_do_aluno,
+          name: item.nome_aluno,
           parents: parents,
           selectedParent: null
         };
@@ -135,9 +135,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data: alunosData, error: alunosError } = await supabase
-        .from('alunos_comunicados_whatsapp')
+        .from('alunos_26')
         .select('*')
-        .eq('turma', turma);
+        .eq('curso', turma);
 
       if (alunosError || !alunosData) {
         toast({
@@ -156,26 +156,25 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
               name: item.nome_pai || "Não informado",
               cpf: (item.cpf_pai && item.cpf_pai !== "null") ? item.cpf_pai : "",
               email: "",
-              phone: (item.ddd_pai && item.celular_pai && item.celular_pai !== "null") ? `${item.ddd_pai}${item.celular_pai}` : "",
+              phone: (item.celular_pai && item.celular_pai !== "null") ? item.celular_pai : "",
               type: "Pai"
             },
             {
-              name: item.nome_da_mae || "Não informado",
+              name: item.nome_mae || "Não informado",
               cpf: (item.cpf_mae && item.cpf_mae !== "null") ? item.cpf_mae : "",
               email: "",
-              phone: (item.ddd_mae && item.celular_mae && item.celular_mae !== "null") ? `${item.ddd_mae}${item.celular_mae}` : "",
+              phone: (item.telefone_mae && item.telefone_mae !== "null") ? item.telefone_mae : "",
               type: "Mãe"
             }
           ].filter(parent => parent.name !== "Não informado");
           
-          // Prioriza Mãe, só usa Pai se Mãe não tiver telefone
           const mae = parents.find(p => p.type === "Mãe");
           const pai = parents.find(p => p.type === "Pai");
           const firstValidParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : (mae || pai || null);
           
           return {
             id: parseInt(item.codigo_aluno),
-            name: item.nome_do_aluno,
+            name: item.nome_aluno,
             parents: parents,
             selectedParent: firstValidParent
           };
