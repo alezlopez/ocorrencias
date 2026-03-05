@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      alunnos_26: {
+      alunos_26: {
         Row: {
           celular_pai: string | null
           codigo_aluno: string | null
@@ -164,31 +164,100 @@ export type Database = {
         }
         Relationships: []
       }
+      codigos_verificacao: {
+        Row: {
+          codigo: string
+          codigo_aluno: string
+          created_at: string | null
+          expires_at: string | null
+          id: number
+          novo_valor: string
+          tipo: string
+          verificado: boolean | null
+        }
+        Insert: {
+          codigo: string
+          codigo_aluno: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: never
+          novo_valor: string
+          tipo: string
+          verificado?: boolean | null
+        }
+        Update: {
+          codigo?: string
+          codigo_aluno?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: never
+          novo_valor?: string
+          tipo?: string
+          verificado?: boolean | null
+        }
+        Relationships: []
+      }
       codigosCurso: {
         Row: {
           codigo: number | null
+          descricao: string | null
           id: number
         }
         Insert: {
           codigo?: number | null
+          descricao?: string | null
           id?: number
         }
         Update: {
           codigo?: number | null
+          descricao?: string | null
           id?: number
+        }
+        Relationships: []
+      }
+      conteudos_taredas: {
+        Row: {
+          Conteudo: string | null
+          created_at: string
+          Curso: string | null
+          data_de_lancamento: string | null
+          Disciplina: string | null
+          id: number
+          "Tarefa de casa": string | null
+        }
+        Insert: {
+          Conteudo?: string | null
+          created_at?: string
+          Curso?: string | null
+          data_de_lancamento?: string | null
+          Disciplina?: string | null
+          id?: number
+          "Tarefa de casa"?: string | null
+        }
+        Update: {
+          Conteudo?: string | null
+          created_at?: string
+          Curso?: string | null
+          data_de_lancamento?: string | null
+          Disciplina?: string | null
+          id?: number
+          "Tarefa de casa"?: string | null
         }
         Relationships: []
       }
       disciplinas_alunos: {
         Row: {
+          cod_discplina: number | null
           disciplina: string
           id: number
         }
         Insert: {
+          cod_discplina?: number | null
           disciplina: string
           id?: number
         }
         Update: {
+          cod_discplina?: number | null
           disciplina?: string
           id?: number
         }
@@ -224,36 +293,6 @@ export type Database = {
           serie_interesse?: string | null
           telefone_responsavel?: string | null
           turno_interesse?: string | null
-        }
-        Relationships: []
-      }
-      lista_vip: {
-        Row: {
-          cpf_responsavel: string
-          created_at: string
-          id: number
-          nome_aluno: string
-          nome_responsavel: string
-          serie_aluno: string
-          whatsapp_responsavel: string
-        }
-        Insert: {
-          cpf_responsavel: string
-          created_at?: string
-          id?: never
-          nome_aluno: string
-          nome_responsavel: string
-          serie_aluno: string
-          whatsapp_responsavel: string
-        }
-        Update: {
-          cpf_responsavel?: string
-          created_at?: string
-          id?: never
-          nome_aluno?: string
-          nome_responsavel?: string
-          serie_aluno?: string
-          whatsapp_responsavel?: string
         }
         Relationships: []
       }
@@ -317,6 +356,45 @@ export type Database = {
           "Nome do Pai"?: string | null
           "Telefone da Mãe"?: string | null
           "Telefone do Pai"?: string | null
+        }
+        Relationships: []
+      }
+      ocorrencias_mhund: {
+        Row: {
+          codigo_aluno: number | null
+          codigo_curso: number | null
+          codigo_discplina: number | null
+          curso: string | null
+          data_ocorrencia: string | null
+          descicao_ocorrencia: string | null
+          disciplina: string | null
+          id: number
+          nome_aluno: string | null
+          titulo_ocorrencia: string | null
+        }
+        Insert: {
+          codigo_aluno?: number | null
+          codigo_curso?: number | null
+          codigo_discplina?: number | null
+          curso?: string | null
+          data_ocorrencia?: string | null
+          descicao_ocorrencia?: string | null
+          disciplina?: string | null
+          id?: number
+          nome_aluno?: string | null
+          titulo_ocorrencia?: string | null
+        }
+        Update: {
+          codigo_aluno?: number | null
+          codigo_curso?: number | null
+          codigo_discplina?: number | null
+          curso?: string | null
+          data_ocorrencia?: string | null
+          descicao_ocorrencia?: string | null
+          disciplina?: string | null
+          id?: number
+          nome_aluno?: string | null
+          titulo_ocorrencia?: string | null
         }
         Relationships: []
       }
@@ -425,33 +503,6 @@ export type Database = {
           turnoPreferencia?: string | null
           usoMedicacao?: string | null
           whatsapp?: string | null
-        }
-        Relationships: []
-      }
-      relacao_alunos: {
-        Row: {
-          "Código do Aluno": number
-          "Curso do Aluno": string | null
-          filtro: string | null
-          "Nome do Aluno": string | null
-          "Nome Responsável": string | null
-          "WhatsApp Responsavel": number | null
-        }
-        Insert: {
-          "Código do Aluno": number
-          "Curso do Aluno"?: string | null
-          filtro?: string | null
-          "Nome do Aluno"?: string | null
-          "Nome Responsável"?: string | null
-          "WhatsApp Responsavel"?: number | null
-        }
-        Update: {
-          "Código do Aluno"?: number
-          "Curso do Aluno"?: string | null
-          filtro?: string | null
-          "Nome do Aluno"?: string | null
-          "Nome Responsável"?: string | null
-          "WhatsApp Responsavel"?: number | null
         }
         Relationships: []
       }
@@ -618,35 +669,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "student_dificults_whatsapp_fkey"
-            columns: ["whatsapp"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["whatsapp"]
-          },
-        ]
-      }
-      student_titles: {
-        Row: {
-          created_at: string
-          id: number
-          title: string | null
-          whatsapp: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          title?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          title?: string | null
-          whatsapp?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_titles_whatsapp_fkey"
             columns: ["whatsapp"]
             isOneToOne: false
             referencedRelation: "students"

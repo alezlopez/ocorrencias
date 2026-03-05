@@ -46,12 +46,12 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
   useEffect(() => {
     const fetchTurmas = async () => {
       const { data, error } = await supabase
-        .from('alunos_comunicados_whatsapp')
-        .select('turma')
-        .order('turma');
+        .from('alunos_26')
+        .select('curso')
+        .order('curso');
       
       if (!error && data) {
-        const uniqueTurmas = [...new Set(data.map(item => item.turma).filter(Boolean))] as string[];
+        const uniqueTurmas = [...new Set(data.map(item => item.curso).filter(Boolean))] as string[];
         setTurmas(uniqueTurmas);
       }
     };
