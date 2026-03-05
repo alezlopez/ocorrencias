@@ -68,9 +68,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('alunos_comunicados_whatsapp')
+        .from('alunos_26')
         .select('*')
-        .ilike('nome_do_aluno', `%${term}%`)
+        .ilike('nome_aluno', `%${term}%`)
         .limit(10);
 
       if (error) {
