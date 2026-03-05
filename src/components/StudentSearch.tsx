@@ -135,9 +135,9 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
     setIsSearching(true);
     try {
       const { data: alunosData, error: alunosError } = await supabase
-        .from('alunos_comunicados_whatsapp')
+        .from('alunos_26')
         .select('*')
-        .eq('turma', turma);
+        .eq('curso', turma);
 
       if (alunosError || !alunosData) {
         toast({
