@@ -320,11 +320,14 @@ export const ContractEditor = () => {
         };
       });
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         alunos,
         arquivos: arquivosBase64,
-        template: "recado_geral"
+        template: selectedWhatsAppTemplate?.templateName || "recado_geral",
       };
+      if (selectedWhatsAppTemplate?.acceptsLink && diversosLink) {
+        payload.link = diversosLink;
+      }
 
       const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
         method: 'POST',
