@@ -10,6 +10,7 @@ import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
 import { ContractPreview } from './ContractPreview';
 import { RichTextEditor } from './RichTextEditor';
+import { WhatsAppPreview } from './WhatsAppPreview';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
 import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
