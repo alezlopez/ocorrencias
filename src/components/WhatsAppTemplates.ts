@@ -51,7 +51,7 @@ Atenciosamente,
 Coordenação do Colégio Zampieri.`,
     acceptsMedia: true,
     acceptsLink: false,
-    available: false,
+    available: true,
   },
   {
     id: 'recado_link',
