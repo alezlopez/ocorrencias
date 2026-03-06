@@ -1,18 +1,25 @@
 
 
-## Diagnóstico
+## Remover Opção "Atas" do Tipo de Documento
 
-O código atual em `ContractEditor.tsx` (linha 349) **já está correto** — ele atribui `publicUrlData.publicUrl` (a URL completa) ao campo `mediaUrl`.
+### Resumo
+Remover o botão "Atas" da seleção de tipo de documento, mantendo apenas "Ocorrências" e "Diversos".
 
-O log do console que aparece ("Mídia enviada com sucesso. **Arquivo**: 1772812140227_4.jpeg") é da versão **anterior** do código, antes da última edição. A versão atual do código diz "**URL**:" no log.
+### Alterações no arquivo `src/components/ContractEditor.tsx`
 
-### O que precisa acontecer
+1. **Atualizar o tipo do estado `documentType`**
+   - Remover `'atas'` das opções permitidas
+   - De: `'ocorrencias' | 'atas' | 'diversos' | null`
+   - Para: `'ocorrencias' | 'diversos' | null`
 
-Basta **recarregar o preview** (hard refresh) para que a versão atualizada do código seja carregada. Não há nenhuma alteração de código necessária — o `mediaUrl` já envia o link completo tipo:
+2. **Remover o botão "Atas"**
+   - Excluir o `<Button>` com texto "Atas" da seção de seleção de tipo de documento
 
-```
-https://lzdhrtcugqnqmyapgmbs.supabase.co/storage/v1/object/public/zampieri/whatsapp-media/1772812140227_4.jpeg
-```
+3. **Remover a mensagem condicional de Atas**
+   - Excluir o bloco `{documentType === 'atas' && (...)}` que exibe a mensagem sobre modelos de Atas
 
-Se após o refresh o problema persistir, posso investigar mais a fundo.
+### Resultado
+A interface mostrará apenas dois botões na seção "Tipo de Documento":
+- **Ocorrências** - para envio de ocorrências com modelos pré-definidos
+- **Diversos** - para envio de documentos diversos com texto livre e anexos
 
