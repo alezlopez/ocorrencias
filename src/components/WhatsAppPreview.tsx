@@ -105,8 +105,8 @@ Coordenação do Colégio Zampieri.`;
                   </p>
                 </div>
 
-                {/* Button for link templates */}
-                {isLink && template?.buttonText && (
+                {/* Button for link or media templates */}
+                {template?.buttonText && (
                   <div className="border-t border-gray-200">
                     <div className="flex items-center justify-center gap-2 py-2 text-blue-500 text-sm">
                       <ExternalLink className="h-4 w-4" />
