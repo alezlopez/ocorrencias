@@ -346,8 +346,9 @@ export const ContractEditor = () => {
           .from('zampieri')
           .getPublicUrl(filePath);
 
-        mediaUrl = publicUrlData.publicUrl;
-        console.log('Mídia enviada com sucesso. URL:', mediaUrl);
+        const fileName = filePath.split('/').pop() || '';
+        mediaUrl = fileName;
+        console.log('Mídia enviada com sucesso. Arquivo:', mediaUrl);
       }
 
       // Converter arquivos para base64 (apenas se NÃO for template de mídia — para outros usos)
