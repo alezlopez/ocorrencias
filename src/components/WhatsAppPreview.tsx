@@ -8,6 +8,7 @@ interface WhatsAppPreviewProps {
   studentName?: string;
   template?: WhatsAppTemplate | null;
   link?: string;
+  mediaFileName?: string;
 }
 
 export const WhatsAppPreview = ({ text, studentName, template, link }: WhatsAppPreviewProps) => {
