@@ -55,6 +55,8 @@ export const ContractEditor = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [diversosText, setDiversosText] = useState('');
   const [diversosFiles, setDiversosFiles] = useState<File[]>([]);
+  const [selectedWhatsAppTemplate, setSelectedWhatsAppTemplate] = useState<WhatsAppTemplate | null>(null);
+  const [diversosLink, setDiversosLink] = useState('');
 
   const handleTemplateSelect = (template: ContractTemplate) => {
     setSelectedTemplate(template.id);
