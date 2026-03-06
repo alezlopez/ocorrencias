@@ -1,25 +1,24 @@
 
 
-## Remover Opção "Atas" do Tipo de Documento
+## Enviar apenas o nome do arquivo no payload (não a URL completa)
 
-### Resumo
-Remover o botão "Atas" da seleção de tipo de documento, mantendo apenas "Ocorrências" e "Diversos".
+### O que será feito
 
-### Alterações no arquivo `src/components/ContractEditor.tsx`
+Editar `src/components/ContractEditor.tsx` — na linha 349, em vez de `mediaUrl = publicUrlData.publicUrl`, extrair apenas o nome do arquivo gerado (`{timestamp}_{sanitizedName}`).
 
-1. **Atualizar o tipo do estado `documentType`**
-   - Remover `'atas'` das opções permitidas
-   - De: `'ocorrencias' | 'atas' | 'diversos' | null`
-   - Para: `'ocorrencias' | 'diversos' | null`
+Como o `filePath` já contém `whatsapp-media/{timestamp}_{sanitizedName}`, basta extrair o nome do arquivo dele:
 
-2. **Remover o botão "Atas"**
-   - Excluir o `<Button>` com texto "Atas" da seção de seleção de tipo de documento
+```typescript
+// Antes:
+mediaUrl = publicUrlData.publicUrl;
 
-3. **Remover a mensagem condicional de Atas**
-   - Excluir o bloco `{documentType === 'atas' && (...)}` que exibe a mensagem sobre modelos de Atas
+// Depois:
+const fileName = filePath.split('/').pop(); // "1772805499207_7.jpeg"
+mediaUrl = fileName;
+```
 
-### Resultado
-A interface mostrará apenas dois botões na seção "Tipo de Documento":
-- **Ocorrências** - para envio de ocorrências com modelos pré-definidos
-- **Diversos** - para envio de documentos diversos com texto livre e anexos
+O campo `mediaUrl` no payload passará a conter apenas `1772805499207_7.jpeg` em vez da URL completa.
+
+### Arquivo
+- **Editar** `src/components/ContractEditor.tsx` — linha ~349, trocar URL pública pelo nome do arquivo
 
