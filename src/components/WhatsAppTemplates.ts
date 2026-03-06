@@ -5,11 +5,13 @@ export interface WhatsAppTemplate {
   name: string;
   description: string;
   type: WhatsAppTemplateType;
-  templateName: string; // Nome no Facebook Business
-  bodyText: string; // Texto do template com {{1}} como placeholder
+  templateName: string;
+  headerText?: string;
+  bodyText: string;
+  buttonText?: string;
   acceptsMedia: boolean;
   acceptsLink: boolean;
-  available: boolean; // Se já foi aprovado no Facebook
+  available: boolean;
 }
 
 export const WHATSAPP_TEMPLATES: WhatsAppTemplate[] = [
@@ -54,22 +56,19 @@ Coordenação do Colégio Zampieri.`,
   {
     id: 'recado_link',
     name: 'Recado + Link',
-    description: 'Mensagem com link e preview de URL.',
+    description: 'Mensagem com botão de link clicável.',
     type: 'link',
     templateName: 'recado_link',
-    bodyText: `Olá, tudo bem? 😁
-
-*Temos um novo recado para você.*
+    headerText: 'Comunicado Importante',
+    bodyText: `Olá, tudo bem? 😊
 
 {{1}}
 
-Acesse: {{2}}
-
-Atenciosamente,
-
-Coordenação do Colégio Zampieri.`,
+Clique no botão abaixo 👇
+Você será direcionado para o google formulário.`,
+    buttonText: 'Acessar',
     acceptsMedia: false,
     acceptsLink: true,
-    available: false,
+    available: true,
   },
 ];
