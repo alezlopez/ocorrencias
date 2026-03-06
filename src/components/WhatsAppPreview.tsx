@@ -11,7 +11,7 @@ interface WhatsAppPreviewProps {
   mediaFileName?: string;
 }
 
-export const WhatsAppPreview = ({ text, studentName, template, link }: WhatsAppPreviewProps) => {
+export const WhatsAppPreview = ({ text, studentName, template, link, mediaFileName }: WhatsAppPreviewProps) => {
   let previewText = text || "";
   if (studentName) {
     previewText = previewText.replace(/\{\{NOME_ALUNO\}\}/g, studentName);
