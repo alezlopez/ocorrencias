@@ -10,6 +10,7 @@ import { StudentSearch } from './StudentSearch';
 import { TemplateSelector } from './TemplateSelector';
 import { ContractPreview } from './ContractPreview';
 import { RichTextEditor } from './RichTextEditor';
+import { WhatsAppPreview } from './WhatsAppPreview';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
 import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
@@ -317,7 +318,8 @@ export const ContractEditor = () => {
 
       const payload = {
         alunos,
-        arquivos: arquivosBase64
+        arquivos: arquivosBase64,
+        template: "recado_geral"
       };
 
       const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
@@ -468,11 +470,19 @@ export const ContractEditor = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div>
-                      <RichTextEditor
-                        value={diversosText}
-                        onChange={setDiversosText}
-                      />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div>
+                        <RichTextEditor
+                          value={diversosText}
+                          onChange={setDiversosText}
+                        />
+                      </div>
+                      <div>
+                        <WhatsAppPreview
+                          text={replaceVariables(diversosText, selectedStudents[0])}
+                          studentName={selectedStudents[0]?.name}
+                        />
+                      </div>
                     </div>
 
                     <div>

@@ -148,7 +148,7 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Digite o texto do documento aqui. Se necessário, use os botões acima para inserir variáveis."
+          placeholder="Digite apenas o conteúdo da mensagem. A saudação e despedida já fazem parte do template do WhatsApp."
           className="min-h-[400px] font-sans text-base leading-relaxed"
           dir="ltr"
           style={{ direction: "ltr", textAlign: "left" }}
