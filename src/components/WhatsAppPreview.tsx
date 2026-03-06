@@ -83,9 +83,9 @@ Coordenação do Colégio Zampieri.`;
                 )}
 
                 {isMedia && (
-                  <div className="mx-3 mt-2 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center h-32">
+                  <div className="mx-0 mt-0 rounded-t-lg bg-gray-200 flex items-center justify-center h-36 relative">
                     <div className="flex flex-col items-center gap-1 text-gray-400">
-                      <Image className="h-8 w-8" />
+                      <Image className="h-10 w-10" />
                       <span className="text-xs">{mediaFileName || 'Mídia anexada'}</span>
                     </div>
                   </div>
