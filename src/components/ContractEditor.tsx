@@ -593,26 +593,34 @@ export const ContractEditor = () => {
                     {selectedWhatsAppTemplate.acceptsMedia && (
                       <div>
                         <Label htmlFor="diversosFiles" className="mb-2 block">
-                          Anexar Mídia
+                          Anexar Mídia (1 arquivo: JPG, PNG ou PDF)
                         </Label>
                         <Input
                           id="diversosFiles"
                           type="file"
-                          multiple
+                          accept="image/jpeg,image/png,application/pdf"
                           onChange={(e) => {
                             const files = Array.from(e.target.files || []);
-                            setDiversosFiles(files);
+                            if (files.length > 0) {
+                              const file = files[0];
+                              const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                              if (!allowedTypes.includes(file.type)) {
+                                toast({
+                                  title: "Tipo de arquivo não permitido",
+                                  description: "Apenas imagens (JPG, PNG) e PDF são aceitos.",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+                              setDiversosFiles([file]);
+                            }
                           }}
                           className="w-full"
                         />
                         {diversosFiles.length > 0 && (
                           <div className="mt-2 text-sm text-muted-foreground">
-                            <strong>Arquivos selecionados:</strong>
-                            <ul className="list-disc list-inside mt-1">
-                              {diversosFiles.map((file, index) => (
-                                <li key={index}>{file.name}</li>
-                              ))}
-                            </ul>
+                            <strong>Arquivo selecionado:</strong> {diversosFiles[0].name}
                           </div>
                         )}
                       </div>
