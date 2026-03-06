@@ -291,21 +291,76 @@ export const ContractEditor = () => {
       return;
     }
 
+    // Validar mídia obrigatória para template de mídia
+    if (selectedWhatsAppTemplate?.acceptsMedia && diversosFiles.length === 0) {
+      toast({
+        title: "Mídia obrigatória",
+        description: "Este template requer um arquivo de mídia (imagem ou PDF).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar link obrigatório para template de link
+    if (selectedWhatsAppTemplate?.acceptsLink && !diversosLink.trim()) {
+      toast({
+        title: "Link obrigatório",
+        description: "Este template requer uma URL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       toast({
         title: "Processando...",
         description: "Enviando documentos diversos...",
       });
 
-      // Converter arquivos para base64
-      const arquivosBase64 = await Promise.all(
-        diversosFiles.map(async (file) => ({
-          nome: file.name,
-          tipo: file.type,
-          tamanho: file.size,
-          base64: await fileToBase64(file)
-        }))
-      );
+      let mediaUrl: string | undefined;
+
+      // Upload de mídia para o Storage se for template de mídia
+      if (selectedWhatsAppTemplate?.acceptsMedia && diversosFiles.length > 0) {
+        const file = diversosFiles[0];
+        const timestamp = Date.now();
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filePath = `whatsapp-media/${timestamp}_${sanitizedName}`;
+
+        toast({
+          title: "Enviando mídia...",
+          description: `Fazendo upload de ${file.name}...`,
+        });
+
+        const { error: uploadError } = await supabase.storage
+          .from('zampieri')
+          .upload(filePath, file, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw new Error(`Erro ao fazer upload da mídia: ${uploadError.message}`);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('zampieri')
+          .getPublicUrl(filePath);
+
+        mediaUrl = publicUrlData.publicUrl;
+        console.log('Mídia enviada com sucesso. URL:', mediaUrl);
+      }
+
+      // Converter arquivos para base64 (apenas se NÃO for template de mídia — para outros usos)
+      const arquivosBase64 = selectedWhatsAppTemplate?.acceptsMedia
+        ? []
+        : await Promise.all(
+            diversosFiles.map(async (file) => ({
+              nome: file.name,
+              tipo: file.type,
+              tamanho: file.size,
+              base64: await fileToBase64(file),
+            }))
+          );
 
       // Preparar array com dados de todos os alunos
       const alunos = selectedStudents.map(student => {
@@ -325,6 +380,9 @@ export const ContractEditor = () => {
         arquivos: arquivosBase64,
         template: selectedWhatsAppTemplate?.templateName || "recado_geral",
       };
+      if (mediaUrl) {
+        payload.mediaUrl = mediaUrl;
+      }
       if (selectedWhatsAppTemplate?.acceptsLink && diversosLink) {
         payload.link = diversosLink;
       }
@@ -510,6 +568,7 @@ export const ContractEditor = () => {
                           studentName={selectedStudents[0]?.name}
                           template={selectedWhatsAppTemplate}
                           link={diversosLink}
+                          mediaFileName={diversosFiles.length > 0 ? diversosFiles[0].name : undefined}
                         />
                       </div>
                     </div>
@@ -535,26 +594,34 @@ export const ContractEditor = () => {
                     {selectedWhatsAppTemplate.acceptsMedia && (
                       <div>
                         <Label htmlFor="diversosFiles" className="mb-2 block">
-                          Anexar Mídia
+                          Anexar Mídia (1 arquivo: JPG, PNG ou PDF)
                         </Label>
                         <Input
                           id="diversosFiles"
                           type="file"
-                          multiple
+                          accept="image/jpeg,image/png,application/pdf"
                           onChange={(e) => {
                             const files = Array.from(e.target.files || []);
-                            setDiversosFiles(files);
+                            if (files.length > 0) {
+                              const file = files[0];
+                              const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                              if (!allowedTypes.includes(file.type)) {
+                                toast({
+                                  title: "Tipo de arquivo não permitido",
+                                  description: "Apenas imagens (JPG, PNG) e PDF são aceitos.",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                                return;
+                              }
+                              setDiversosFiles([file]);
+                            }
                           }}
                           className="w-full"
                         />
                         {diversosFiles.length > 0 && (
                           <div className="mt-2 text-sm text-muted-foreground">
-                            <strong>Arquivos selecionados:</strong>
-                            <ul className="list-disc list-inside mt-1">
-                              {diversosFiles.map((file, index) => (
-                                <li key={index}>{file.name}</li>
-                              ))}
-                            </ul>
+                            <strong>Arquivo selecionado:</strong> {diversosFiles[0].name}
                           </div>
                         )}
                       </div>

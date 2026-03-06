@@ -8,9 +8,10 @@ interface WhatsAppPreviewProps {
   studentName?: string;
   template?: WhatsAppTemplate | null;
   link?: string;
+  mediaFileName?: string;
 }
 
-export const WhatsAppPreview = ({ text, studentName, template, link }: WhatsAppPreviewProps) => {
+export const WhatsAppPreview = ({ text, studentName, template, link, mediaFileName }: WhatsAppPreviewProps) => {
   let previewText = text || "";
   if (studentName) {
     previewText = previewText.replace(/\{\{NOME_ALUNO\}\}/g, studentName);
@@ -85,7 +86,7 @@ Coordenação do Colégio Zampieri.`;
                   <div className="mx-3 mt-2 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center h-32">
                     <div className="flex flex-col items-center gap-1 text-gray-400">
                       <Image className="h-8 w-8" />
-                      <span className="text-xs">Mídia anexada</span>
+                      <span className="text-xs">{mediaFileName || 'Mídia anexada'}</span>
                     </div>
                   </div>
                 )}
