@@ -349,6 +349,8 @@ export const ContractEditor = () => {
       // Limpar campos após envio
       setDiversosText('');
       setDiversosFiles([]);
+      setDiversosLink('');
+      setSelectedWhatsAppTemplate(null);
       setSelectedStudents([]);
       setDocumentType(null);
 
