@@ -469,11 +469,19 @@ export const ContractEditor = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div>
-                      <RichTextEditor
-                        value={diversosText}
-                        onChange={setDiversosText}
-                      />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div>
+                        <RichTextEditor
+                          value={diversosText}
+                          onChange={setDiversosText}
+                        />
+                      </div>
+                      <div>
+                        <WhatsAppPreview
+                          text={replaceVariables(diversosText, selectedStudents[0])}
+                          studentName={selectedStudents[0]?.name}
+                        />
+                      </div>
                     </div>
 
                     <div>
