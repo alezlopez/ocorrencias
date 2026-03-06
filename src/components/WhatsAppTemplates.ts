@@ -37,18 +37,16 @@ Coordenação do Colégio Zampieri.`,
   {
     id: 'recado_midia',
     name: 'Recado + Imagem',
-    description: 'Mensagem com imagem ou PDF anexado.',
+    description: 'Mensagem com imagem ou PDF anexado e botão de acesso.',
     type: 'media',
     templateName: 'recado_midia',
-    bodyText: `Olá, tudo bem? 😁
-
-*Temos um novo recado para você.*
+    bodyText: `Olá, tudo bem? 😊
 
 {{1}}
 
-Atenciosamente,
-
-Coordenação do Colégio Zampieri.`,
+Clique no botão abaixo👇
+Nossas midias ficam hospedadas em nosso servidor`,
+    buttonText: 'Acessar conteúdo',
     acceptsMedia: true,
     acceptsLink: false,
     available: true,
