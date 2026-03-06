@@ -346,8 +346,9 @@ export const ContractEditor = () => {
           .from('zampieri')
           .getPublicUrl(filePath);
 
+        // Enviar URL completa do Supabase Storage
         mediaUrl = publicUrlData.publicUrl;
-        console.log('Mídia enviada com sucesso. URL:', mediaUrl);
+        console.log('Mídia enviada com sucesso. URL completa:', mediaUrl);
       }
 
       // Converter arquivos para base64 (apenas se NÃO for template de mídia — para outros usos)
