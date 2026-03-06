@@ -12,6 +12,8 @@ import { ContractPreview } from './ContractPreview';
 import { RichTextEditor } from './RichTextEditor';
 import { WhatsAppPreview } from './WhatsAppPreview';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
+import { WhatsAppTemplate } from './WhatsAppTemplates';
+import { WhatsAppTemplateSelector } from './WhatsAppTemplateSelector';
 import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
 
@@ -53,6 +55,8 @@ export const ContractEditor = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [diversosText, setDiversosText] = useState('');
   const [diversosFiles, setDiversosFiles] = useState<File[]>([]);
+  const [selectedWhatsAppTemplate, setSelectedWhatsAppTemplate] = useState<WhatsAppTemplate | null>(null);
+  const [diversosLink, setDiversosLink] = useState('');
 
   const handleTemplateSelect = (template: ContractTemplate) => {
     setSelectedTemplate(template.id);
@@ -316,11 +320,14 @@ export const ContractEditor = () => {
         };
       });
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         alunos,
         arquivos: arquivosBase64,
-        template: "recado_geral"
+        template: selectedWhatsAppTemplate?.templateName || "recado_geral",
       };
+      if (selectedWhatsAppTemplate?.acceptsLink && diversosLink) {
+        payload.link = diversosLink;
+      }
 
       const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
         method: 'POST',
@@ -342,6 +349,8 @@ export const ContractEditor = () => {
       // Limpar campos após envio
       setDiversosText('');
       setDiversosFiles([]);
+      setDiversosLink('');
+      setSelectedWhatsAppTemplate(null);
       setSelectedStudents([]);
       setDocumentType(null);
 
@@ -460,13 +469,31 @@ export const ContractEditor = () => {
                 </Card>
               )}
 
-              {/* Formulário Diversos */}
+              {/* Seletor de Template WhatsApp (Diversos) */}
               {documentType === 'diversos' && (
                 <Card className="shadow-card animate-slide-up">
                   <CardHeader className="bg-gradient-card rounded-t-lg">
                     <CardTitle className="flex items-center gap-2">
                       <FileText className="h-5 w-5 text-primary" />
-                      3. Preencher Documento Diversos
+                      3. Escolher Template WhatsApp
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <WhatsAppTemplateSelector
+                      selectedTemplate={selectedWhatsAppTemplate}
+                      onTemplateSelect={setSelectedWhatsAppTemplate}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Formulário Diversos */}
+              {documentType === 'diversos' && selectedWhatsAppTemplate && (
+                <Card className="shadow-card animate-slide-up">
+                  <CardHeader className="bg-gradient-card rounded-t-lg">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      4. Preencher Mensagem
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
@@ -481,35 +508,57 @@ export const ContractEditor = () => {
                         <WhatsAppPreview
                           text={replaceVariables(diversosText, selectedStudents[0])}
                           studentName={selectedStudents[0]?.name}
+                          template={selectedWhatsAppTemplate}
+                          link={diversosLink}
                         />
                       </div>
                     </div>
 
-                    <div>
-                      <Label htmlFor="diversosFiles" className="mb-2 block">
-                        Anexar Documentos (opcional)
-                      </Label>
-                      <Input
-                        id="diversosFiles"
-                        type="file"
-                        multiple
-                        onChange={(e) => {
-                          const files = Array.from(e.target.files || []);
-                          setDiversosFiles(files);
-                        }}
-                        className="w-full"
-                      />
-                      {diversosFiles.length > 0 && (
-                        <div className="mt-2 text-sm text-muted-foreground">
-                          <strong>Arquivos selecionados:</strong>
-                          <ul className="list-disc list-inside mt-1">
-                            {diversosFiles.map((file, index) => (
-                              <li key={index}>{file.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                    {/* Campo de Link (apenas para templates de link) */}
+                    {selectedWhatsAppTemplate.acceptsLink && (
+                      <div>
+                        <Label htmlFor="diversosLink" className="mb-2 block">
+                          URL do Link
+                        </Label>
+                        <Input
+                          id="diversosLink"
+                          type="url"
+                          placeholder="https://exemplo.com/documento"
+                          value={diversosLink}
+                          onChange={(e) => setDiversosLink(e.target.value)}
+                          className="w-full"
+                        />
+                      </div>
+                    )}
+
+                    {/* Campo de Anexo (apenas para templates de mídia) */}
+                    {selectedWhatsAppTemplate.acceptsMedia && (
+                      <div>
+                        <Label htmlFor="diversosFiles" className="mb-2 block">
+                          Anexar Mídia
+                        </Label>
+                        <Input
+                          id="diversosFiles"
+                          type="file"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            setDiversosFiles(files);
+                          }}
+                          className="w-full"
+                        />
+                        {diversosFiles.length > 0 && (
+                          <div className="mt-2 text-sm text-muted-foreground">
+                            <strong>Arquivos selecionados:</strong>
+                            <ul className="list-disc list-inside mt-1">
+                              {diversosFiles.map((file, index) => (
+                                <li key={index}>{file.name}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <Button 
                       size="lg"
@@ -517,7 +566,7 @@ export const ContractEditor = () => {
                       onClick={handleSendDiversos}
                     >
                       <Send className="h-4 w-4" />
-                      Enviar Documentos Diversos
+                      Enviar via WhatsApp
                     </Button>
                   </CardContent>
                 </Card>
