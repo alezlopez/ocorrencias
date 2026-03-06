@@ -17,11 +17,15 @@ export type Database = {
       alunos_26: {
         Row: {
           celular_pai: string | null
+          cod_mae: number | null
+          cod_pai: number | null
           codigo_aluno: string | null
           cpf_mae: string | null
           cpf_pai: string | null
           created_at: string
           curso: string | null
+          email_mae: string | null
+          email_pai: string | null
           id: number
           nome_aluno: string | null
           nome_mae: string | null
@@ -30,11 +34,15 @@ export type Database = {
         }
         Insert: {
           celular_pai?: string | null
+          cod_mae?: number | null
+          cod_pai?: number | null
           codigo_aluno?: string | null
           cpf_mae?: string | null
           cpf_pai?: string | null
           created_at?: string
           curso?: string | null
+          email_mae?: string | null
+          email_pai?: string | null
           id?: number
           nome_aluno?: string | null
           nome_mae?: string | null
@@ -43,61 +51,20 @@ export type Database = {
         }
         Update: {
           celular_pai?: string | null
+          cod_mae?: number | null
+          cod_pai?: number | null
           codigo_aluno?: string | null
           cpf_mae?: string | null
           cpf_pai?: string | null
           created_at?: string
           curso?: string | null
+          email_mae?: string | null
+          email_pai?: string | null
           id?: number
           nome_aluno?: string | null
           nome_mae?: string | null
           nome_pai?: string | null
           telefone_mae?: string | null
-        }
-        Relationships: []
-      }
-      alunos_comunicados_whatsapp: {
-        Row: {
-          celular_mae: string | null
-          celular_pai: string | null
-          codigo_aluno: string
-          cpf_mae: string | null
-          cpf_pai: string | null
-          ddd_mae: string | null
-          ddd_pai: string | null
-          ID: number
-          nome_da_mae: string | null
-          nome_do_aluno: string | null
-          nome_pai: string | null
-          turma: string | null
-        }
-        Insert: {
-          celular_mae?: string | null
-          celular_pai?: string | null
-          codigo_aluno: string
-          cpf_mae?: string | null
-          cpf_pai?: string | null
-          ddd_mae?: string | null
-          ddd_pai?: string | null
-          ID?: number
-          nome_da_mae?: string | null
-          nome_do_aluno?: string | null
-          nome_pai?: string | null
-          turma?: string | null
-        }
-        Update: {
-          celular_mae?: string | null
-          celular_pai?: string | null
-          codigo_aluno?: string
-          cpf_mae?: string | null
-          cpf_pai?: string | null
-          ddd_mae?: string | null
-          ddd_pai?: string | null
-          ID?: number
-          nome_da_mae?: string | null
-          nome_do_aluno?: string | null
-          nome_pai?: string | null
-          turma?: string | null
         }
         Relationships: []
       }
@@ -260,102 +227,6 @@ export type Database = {
           cod_discplina?: number | null
           disciplina?: string
           id?: number
-        }
-        Relationships: []
-      }
-      interessados_matricula: {
-        Row: {
-          created_at: string
-          escola_atual: string | null
-          follow_up: boolean | null
-          id: number
-          nome_responsavel: string | null
-          serie_interesse: string | null
-          telefone_responsavel: string | null
-          turno_interesse: string | null
-        }
-        Insert: {
-          created_at?: string
-          escola_atual?: string | null
-          follow_up?: boolean | null
-          id?: number
-          nome_responsavel?: string | null
-          serie_interesse?: string | null
-          telefone_responsavel?: string | null
-          turno_interesse?: string | null
-        }
-        Update: {
-          created_at?: string
-          escola_atual?: string | null
-          follow_up?: boolean | null
-          id?: number
-          nome_responsavel?: string | null
-          serie_interesse?: string | null
-          telefone_responsavel?: string | null
-          turno_interesse?: string | null
-        }
-        Relationships: []
-      }
-      numeros_da_sorte: {
-        Row: {
-          Aluno: string | null
-          cpf: string | null
-          created_at: string
-          id: number
-          numero_da_sorte: number | null
-        }
-        Insert: {
-          Aluno?: string | null
-          cpf?: string | null
-          created_at?: string
-          id?: number
-          numero_da_sorte?: number | null
-        }
-        Update: {
-          Aluno?: string | null
-          cpf?: string | null
-          created_at?: string
-          id?: number
-          numero_da_sorte?: number | null
-        }
-        Relationships: []
-      }
-      ocorrencias: {
-        Row: {
-          "Cod Aluno": number
-          "CPF da mãe": string | null
-          "CPF do Pai": string | null
-          "Email da Mãe": string | null
-          "Email do Pai": string | null
-          "Nome da mãe": string | null
-          "Nome do Aluno": string | null
-          "Nome do Pai": string | null
-          "Telefone da Mãe": string | null
-          "Telefone do Pai": string | null
-        }
-        Insert: {
-          "Cod Aluno": number
-          "CPF da mãe"?: string | null
-          "CPF do Pai"?: string | null
-          "Email da Mãe"?: string | null
-          "Email do Pai"?: string | null
-          "Nome da mãe"?: string | null
-          "Nome do Aluno"?: string | null
-          "Nome do Pai"?: string | null
-          "Telefone da Mãe"?: string | null
-          "Telefone do Pai"?: string | null
-        }
-        Update: {
-          "Cod Aluno"?: number
-          "CPF da mãe"?: string | null
-          "CPF do Pai"?: string | null
-          "Email da Mãe"?: string | null
-          "Email do Pai"?: string | null
-          "Nome da mãe"?: string | null
-          "Nome do Aluno"?: string | null
-          "Nome do Pai"?: string | null
-          "Telefone da Mãe"?: string | null
-          "Telefone do Pai"?: string | null
         }
         Relationships: []
       }
@@ -644,128 +515,6 @@ export type Database = {
           "Telefone do Pai"?: string | null
           "token contrato"?: string | null
           "Turno 2026"?: string | null
-        }
-        Relationships: []
-      }
-      student_dificults: {
-        Row: {
-          created_at: string
-          dificult_area: string | null
-          id: number
-          whatsapp: string | null
-        }
-        Insert: {
-          created_at?: string
-          dificult_area?: string | null
-          id?: number
-          whatsapp?: string | null
-        }
-        Update: {
-          created_at?: string
-          dificult_area?: string | null
-          id?: number
-          whatsapp?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_dificults_whatsapp_fkey"
-            columns: ["whatsapp"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["whatsapp"]
-          },
-        ]
-      }
-      students: {
-        Row: {
-          assinatura_status: string | null
-          cancelado_em: string | null
-          cancelar_em: string | null
-          coins: number | null
-          created_at: string | null
-          current_mission: string | null
-          current_trill: string | null
-          email: string | null
-          hits: number | null
-          id: string
-          idade: number | null
-          last_payament: string | null
-          level: string | null
-          mission_amout: number | null
-          nome: string | null
-          premium: boolean | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          test_amout: number | null
-          trial: boolean | null
-          trial_ends_at: string | null
-          whatsapp: string | null
-          xp: number | null
-        }
-        Insert: {
-          assinatura_status?: string | null
-          cancelado_em?: string | null
-          cancelar_em?: string | null
-          coins?: number | null
-          created_at?: string | null
-          current_mission?: string | null
-          current_trill?: string | null
-          email?: string | null
-          hits?: number | null
-          id?: string
-          idade?: number | null
-          last_payament?: string | null
-          level?: string | null
-          mission_amout?: number | null
-          nome?: string | null
-          premium?: boolean | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          test_amout?: number | null
-          trial?: boolean | null
-          trial_ends_at?: string | null
-          whatsapp?: string | null
-          xp?: number | null
-        }
-        Update: {
-          assinatura_status?: string | null
-          cancelado_em?: string | null
-          cancelar_em?: string | null
-          coins?: number | null
-          created_at?: string | null
-          current_mission?: string | null
-          current_trill?: string | null
-          email?: string | null
-          hits?: number | null
-          id?: string
-          idade?: number | null
-          last_payament?: string | null
-          level?: string | null
-          mission_amout?: number | null
-          nome?: string | null
-          premium?: boolean | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          test_amout?: number | null
-          trial?: boolean | null
-          trial_ends_at?: string | null
-          whatsapp?: string | null
-          xp?: number | null
-        }
-        Relationships: []
-      }
-      turmas_alunos: {
-        Row: {
-          Código: number
-          Turma: string | null
-        }
-        Insert: {
-          Código: number
-          Turma?: string | null
-        }
-        Update: {
-          Código?: number
-          Turma?: string | null
         }
         Relationships: []
       }
