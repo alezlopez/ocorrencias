@@ -568,6 +568,7 @@ export const ContractEditor = () => {
                           studentName={selectedStudents[0]?.name}
                           template={selectedWhatsAppTemplate}
                           link={diversosLink}
+                          mediaFileName={diversosFiles.length > 0 ? diversosFiles[0].name : undefined}
                         />
                       </div>
                     </div>
