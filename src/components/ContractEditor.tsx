@@ -12,6 +12,8 @@ import { ContractPreview } from './ContractPreview';
 import { RichTextEditor } from './RichTextEditor';
 import { WhatsAppPreview } from './WhatsAppPreview';
 import { CONTRACT_TEMPLATES, ContractTemplate } from './ContractTemplates';
+import { WhatsAppTemplate } from './WhatsAppTemplates';
+import { WhatsAppTemplateSelector } from './WhatsAppTemplateSelector';
 import { supabase } from '@/integrations/supabase/client';
 import html2pdf from 'html2pdf.js';
 
