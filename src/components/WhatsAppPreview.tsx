@@ -71,11 +71,18 @@ Coordenação do Colégio Zampieri.`;
           >
             <div className="max-w-[85%] self-start">
               <div
-                className="rounded-lg rounded-tl-none px-3 py-2 text-sm shadow-sm relative"
+                className="rounded-lg rounded-tl-none shadow-sm relative overflow-hidden"
                 style={{ backgroundColor: "#FFFFFF" }}
               >
+                {/* Header */}
+                {template?.headerText && (
+                  <div className="px-3 pt-2">
+                    <p className="font-bold text-gray-900 text-sm">{template.headerText}</p>
+                  </div>
+                )}
+
                 {isMedia && (
-                  <div className="mb-2 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center h-32">
+                  <div className="mx-3 mt-2 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center h-32">
                     <div className="flex flex-col items-center gap-1 text-gray-400">
                       <Image className="h-8 w-8" />
                       <span className="text-xs">Mídia anexada</span>
@@ -83,26 +90,29 @@ Coordenação do Colégio Zampieri.`;
                   </div>
                 )}
 
-                <p className="whitespace-pre-wrap leading-relaxed text-gray-800">
-                  {renderedBody || (
-                    <span className="italic text-gray-400">
-                      Digite a mensagem ao lado...
-                    </span>
-                  )}
-                </p>
+                <div className="px-3 py-2">
+                  <p className="whitespace-pre-wrap leading-relaxed text-gray-800 text-sm">
+                    {renderedBody || (
+                      <span className="italic text-gray-400">
+                        Digite a mensagem ao lado...
+                      </span>
+                    )}
+                  </p>
 
-                {isLink && link && (
-                  <div className="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2">
-                    <div className="flex items-center gap-2">
-                      <ExternalLink className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                      <span className="text-xs text-blue-600 truncate">{link}</span>
+                  <p className="text-right mt-1" style={{ fontSize: "10px", color: "#8E8E8E" }}>
+                    {currentTime} ✓✓
+                  </p>
+                </div>
+
+                {/* Button for link templates */}
+                {isLink && template?.buttonText && (
+                  <div className="border-t border-gray-200">
+                    <div className="flex items-center justify-center gap-2 py-2 text-blue-500 text-sm">
+                      <ExternalLink className="h-4 w-4" />
+                      <span>{template.buttonText}</span>
                     </div>
                   </div>
                 )}
-
-                <p className="text-right mt-1" style={{ fontSize: "10px", color: "#8E8E8E" }}>
-                  {currentTime} ✓✓
-                </p>
               </div>
             </div>
           </div>
