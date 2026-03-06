@@ -318,7 +318,8 @@ export const ContractEditor = () => {
 
       const payload = {
         alunos,
-        arquivos: arquivosBase64
+        arquivos: arquivosBase64,
+        template: "recado_geral"
       };
 
       const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
