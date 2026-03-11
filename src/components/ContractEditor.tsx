@@ -23,23 +23,20 @@ interface ContractData {
   content: string;
 }
 
+interface Parent {
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  type: string;
+}
+
 interface Student {
   id: number;
   name: string;
-  parents: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  }[];
-  selectedParent?: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  } | null;
+  parents: Parent[];
+  selectedParent?: Parent | null;
+  selectedParents?: Parent[];
 }
 
 export const ContractEditor = () => {
