@@ -9,23 +9,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
+interface Parent {
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  type: string;
+}
+
 interface Student {
   id: number;
   name: string;
-  parents: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  }[];
-  selectedParent?: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  } | null;
+  parents: Parent[];
+  selectedParent?: Parent | null;
+  selectedParents?: Parent[];
 }
 
 interface StudentSearchProps {
