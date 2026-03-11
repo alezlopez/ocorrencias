@@ -9,23 +9,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
+interface Parent {
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  type: string;
+}
+
 interface Student {
   id: number;
   name: string;
-  parents: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  }[];
-  selectedParent?: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  } | null;
+  parents: Parent[];
+  selectedParent?: Parent | null;
+  selectedParents?: Parent[];
 }
 
 interface StudentSearchProps {
@@ -168,15 +165,16 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             }
           ].filter(parent => parent.name !== "Não informado");
           
-          const mae = parents.find(p => p.type === "Mãe");
-          const pai = parents.find(p => p.type === "Pai");
-          const firstValidParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : (mae || pai || null);
+          // Selecionar TODOS os pais válidos para turma completa
+          const validParents = parents.filter(p => p.name && p.name !== "Não informado");
+          const firstValidParent = validParents[0] || null;
           
           return {
             id: parseInt(item.codigo_aluno),
             name: item.nome_aluno,
             parents: parents,
-            selectedParent: firstValidParent
+            selectedParent: firstValidParent,
+            selectedParents: validParents
           };
         });
 
@@ -316,7 +314,7 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             {selectedStudents.map((student) => (
               <div key={student.id} className="p-4 border rounded-lg bg-card">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-sm">{student.name}</span>
                   </div>
@@ -328,7 +326,22 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
                   </button>
                 </div>
                 
-                {!student.selectedParent ? (
+                {student.selectedParents && student.selectedParents.length > 0 ? (
+                  <div className="space-y-2">
+                    {student.selectedParents.map((parent) => (
+                      <div key={parent.type} className="p-3 bg-accent/30 rounded-lg">
+                        <div className="text-sm font-medium mb-1">
+                          {parent.type === 'Pai' ? '👨 Pai' : '👩 Mãe'}
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div>Nome: {parent.name}</div>
+                          <div>CPF: {parent.cpf || 'Não informado'}</div>
+                          <div>Tel: {parent.phone || 'Não informado'}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : !student.selectedParent ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Users className="h-4 w-4" />

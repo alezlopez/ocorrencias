@@ -131,6 +131,48 @@ export type Database = {
         }
         Relationships: []
       }
+      boletos_26: {
+        Row: {
+          codigo_aluno: string | null
+          created_at: string
+          curso: string | null
+          data_pagamento_boleto: string | null
+          id: number
+          link_boleto: string | null
+          mes_boleto: string | null
+          nome_aluno: string | null
+          status_boleto: string | null
+          valor_boleto: string | null
+          vencimento_boleto: string | null
+        }
+        Insert: {
+          codigo_aluno?: string | null
+          created_at?: string
+          curso?: string | null
+          data_pagamento_boleto?: string | null
+          id?: number
+          link_boleto?: string | null
+          mes_boleto?: string | null
+          nome_aluno?: string | null
+          status_boleto?: string | null
+          valor_boleto?: string | null
+          vencimento_boleto?: string | null
+        }
+        Update: {
+          codigo_aluno?: string | null
+          created_at?: string
+          curso?: string | null
+          data_pagamento_boleto?: string | null
+          id?: number
+          link_boleto?: string | null
+          mes_boleto?: string | null
+          nome_aluno?: string | null
+          status_boleto?: string | null
+          valor_boleto?: string | null
+          vencimento_boleto?: string | null
+        }
+        Relationships: []
+      }
       codigos_verificacao: {
         Row: {
           codigo: string

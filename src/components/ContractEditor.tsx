@@ -23,23 +23,20 @@ interface ContractData {
   content: string;
 }
 
+interface Parent {
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  type: string;
+}
+
 interface Student {
   id: number;
   name: string;
-  parents: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  }[];
-  selectedParent?: {
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    type: string;
-  } | null;
+  parents: Parent[];
+  selectedParent?: Parent | null;
+  selectedParents?: Parent[];
 }
 
 export const ContractEditor = () => {
@@ -363,17 +360,24 @@ export const ContractEditor = () => {
             }))
           );
 
-      // Preparar array com dados de todos os alunos
-      const alunos = selectedStudents.map(student => {
+      // Preparar array com dados de todos os alunos (flatMap para gerar uma entrada por responsável)
+      const alunos = selectedStudents.flatMap(student => {
         const processedText = replaceVariables(diversosText, student);
         
-        return {
+        // Se tem selectedParents (turma completa), gerar uma entrada por responsável
+        const parents = student.selectedParents && student.selectedParents.length > 0
+          ? student.selectedParents
+          : student.selectedParent
+            ? [student.selectedParent]
+            : [];
+        
+        return parents.map(parent => ({
           texto: processedText,
           nomeAluno: student.name,
-          nomeResponsavel: student.selectedParent?.name || '',
-          cpfResponsavel: student.selectedParent?.cpf || '',
-          whatsapp: student.selectedParent?.phone || ''
-        };
+          nomeResponsavel: parent.name || '',
+          cpfResponsavel: parent.cpf || '',
+          whatsapp: parent.phone || ''
+        }));
       });
 
       const payload: Record<string, unknown> = {
