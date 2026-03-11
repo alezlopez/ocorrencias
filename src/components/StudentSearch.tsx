@@ -314,7 +314,7 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             {selectedStudents.map((student) => (
               <div key={student.id} className="p-4 border rounded-lg bg-card">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-sm">{student.name}</span>
                   </div>
@@ -326,7 +326,22 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
                   </button>
                 </div>
                 
-                {!student.selectedParent ? (
+                {student.selectedParents && student.selectedParents.length > 0 ? (
+                  <div className="space-y-2">
+                    {student.selectedParents.map((parent) => (
+                      <div key={parent.type} className="p-3 bg-accent/30 rounded-lg">
+                        <div className="text-sm font-medium mb-1">
+                          {parent.type === 'Pai' ? '👨 Pai' : '👩 Mãe'}
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div>Nome: {parent.name}</div>
+                          <div>CPF: {parent.cpf || 'Não informado'}</div>
+                          <div>Tel: {parent.phone || 'Não informado'}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : !student.selectedParent ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Users className="h-4 w-4" />

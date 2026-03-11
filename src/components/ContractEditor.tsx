@@ -360,17 +360,24 @@ export const ContractEditor = () => {
             }))
           );
 
-      // Preparar array com dados de todos os alunos
-      const alunos = selectedStudents.map(student => {
+      // Preparar array com dados de todos os alunos (flatMap para gerar uma entrada por responsável)
+      const alunos = selectedStudents.flatMap(student => {
         const processedText = replaceVariables(diversosText, student);
         
-        return {
+        // Se tem selectedParents (turma completa), gerar uma entrada por responsável
+        const parents = student.selectedParents && student.selectedParents.length > 0
+          ? student.selectedParents
+          : student.selectedParent
+            ? [student.selectedParent]
+            : [];
+        
+        return parents.map(parent => ({
           texto: processedText,
           nomeAluno: student.name,
-          nomeResponsavel: student.selectedParent?.name || '',
-          cpfResponsavel: student.selectedParent?.cpf || '',
-          whatsapp: student.selectedParent?.phone || ''
-        };
+          nomeResponsavel: parent.name || '',
+          cpfResponsavel: parent.cpf || '',
+          whatsapp: parent.phone || ''
+        }));
       });
 
       const payload: Record<string, unknown> = {
