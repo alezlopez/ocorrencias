@@ -392,16 +392,16 @@ export const ContractEditor = () => {
         payload.link = diversosLink;
       }
 
-      const response = await fetch('https://n8n.colegiozampieri.com/webhook/b1a9391d-4115-45f9-aa1f-08119c4ca2fd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('send-whatsapp', {
+        body: payload,
       });
 
-      if (!response.ok) {
-        throw new Error('Erro ao enviar documentos');
+      if (fnError) {
+        throw new Error(fnError.message || 'Erro ao enviar documentos');
+      }
+
+      if (fnData && !fnData.success) {
+        throw new Error(fnData.error || 'Erro ao enviar documentos');
       }
 
       toast({
