@@ -131,6 +131,33 @@ export type Database = {
         }
         Relationships: []
       }
+      boletim_mensal_26: {
+        Row: {
+          codigo_aluno: string | null
+          curso: string | null
+          hash: string | null
+          id: number
+          link_boletim: string | null
+          nome_aluno: string | null
+        }
+        Insert: {
+          codigo_aluno?: string | null
+          curso?: string | null
+          hash?: string | null
+          id?: number
+          link_boletim?: string | null
+          nome_aluno?: string | null
+        }
+        Update: {
+          codigo_aluno?: string | null
+          curso?: string | null
+          hash?: string | null
+          id?: number
+          link_boletim?: string | null
+          nome_aluno?: string | null
+        }
+        Relationships: []
+      }
       boletos_26: {
         Row: {
           codigo_aluno: string | null
@@ -221,6 +248,30 @@ export type Database = {
           codigo?: number | null
           descricao?: string | null
           id?: number
+        }
+        Relationships: []
+      }
+      comunicados_2026: {
+        Row: {
+          created_at: string
+          id: number
+          link: string | null
+          mensagem: string | null
+          nome_aluno: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          link?: string | null
+          mensagem?: string | null
+          nome_aluno?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          link?: string | null
+          mensagem?: string | null
+          nome_aluno?: string | null
         }
         Relationships: []
       }
