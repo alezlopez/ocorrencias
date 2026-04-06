@@ -36,8 +36,8 @@ Coordenação do Colégio Zampieri.`,
   },
   {
     id: 'recado_midia',
-    name: 'Recado + Imagem',
-    description: 'Mensagem com imagem ou PDF anexado e botão de acesso.',
+    name: 'Recado + Mídia',
+    description: 'Mensagem com imagem, vídeo ou PDF anexado e botão de acesso.',
     type: 'media',
     templateName: 'recado_midia',
     bodyText: `Olá, tudo bem? 😊
