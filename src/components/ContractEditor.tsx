@@ -609,11 +609,11 @@ export const ContractEditor = () => {
                             const files = Array.from(e.target.files || []);
                             if (files.length > 0) {
                               const file = files[0];
-                              const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                              const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
                               if (!allowedTypes.includes(file.type)) {
                                 toast({
                                   title: "Tipo de arquivo não permitido",
-                                  description: "Apenas imagens (JPG, PNG) e PDF são aceitos.",
+                                  description: "Apenas imagens (JPG, PNG), PDF e vídeos (MP4, MOV, AVI, WebM) são aceitos.",
                                   variant: "destructive",
                                 });
                                 e.target.value = '';
