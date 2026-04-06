@@ -165,16 +165,18 @@ export const StudentSearch = ({ selectedStudents, onStudentSelect, onStudentRemo
             }
           ].filter(parent => parent.name !== "Não informado");
           
-          // Selecionar TODOS os pais válidos para turma completa
-          const validParents = parents.filter(p => p.name && p.name !== "Não informado");
-          const firstValidParent = validParents[0] || null;
+          const mae = parents.find(p => p.type === 'Mãe');
+          const pai = parents.find(p => p.type === 'Pai');
+
+          // Priorizar mãe; usar pai somente se mãe não tiver telefone
+          const selectedParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : mae || pai || null;
           
           return {
             id: parseInt(item.codigo_aluno),
             name: item.nome_aluno,
             parents: parents,
-            selectedParent: firstValidParent,
-            selectedParents: validParents
+            selectedParent: selectedParent,
+            selectedParents: selectedParent ? [selectedParent] : []
           };
         });
 
