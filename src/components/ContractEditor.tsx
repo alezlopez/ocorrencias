@@ -604,7 +604,7 @@ export const ContractEditor = () => {
                         <Input
                           id="diversosFiles"
                           type="file"
-                          accept="image/jpeg,image/png,application/pdf"
+                          accept="image/jpeg,image/png,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/webm"
                           onChange={(e) => {
                             const files = Array.from(e.target.files || []);
                             if (files.length > 0) {

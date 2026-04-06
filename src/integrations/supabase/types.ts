@@ -161,6 +161,7 @@ export type Database = {
       boletos_26: {
         Row: {
           codigo_aluno: string | null
+          codigo_barras: string | null
           created_at: string
           curso: string | null
           data_pagamento_boleto: string | null
@@ -174,6 +175,7 @@ export type Database = {
         }
         Insert: {
           codigo_aluno?: string | null
+          codigo_barras?: string | null
           created_at?: string
           curso?: string | null
           data_pagamento_boleto?: string | null
@@ -187,6 +189,7 @@ export type Database = {
         }
         Update: {
           codigo_aluno?: string | null
+          codigo_barras?: string | null
           created_at?: string
           curso?: string | null
           data_pagamento_boleto?: string | null
