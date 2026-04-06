@@ -1,25 +1,23 @@
 
 
-## Remover Opção "Atas" do Tipo de Documento
+## Permitir upload de vídeo no template Recado + Mídia
 
-### Resumo
-Remover o botão "Atas" da seleção de tipo de documento, mantendo apenas "Ocorrências" e "Diversos".
+### O que será feito
 
-### Alterações no arquivo `src/components/ContractEditor.tsx`
+Adicionar formatos de vídeo (MP4, MOV, AVI) ao campo de upload de arquivos no template "Recado + Mídia" da aba Diversos.
 
-1. **Atualizar o tipo do estado `documentType`**
-   - Remover `'atas'` das opções permitidas
-   - De: `'ocorrencias' | 'atas' | 'diversos' | null`
-   - Para: `'ocorrencias' | 'diversos' | null`
+### Alteração
 
-2. **Remover o botão "Atas"**
-   - Excluir o `<Button>` com texto "Atas" da seção de seleção de tipo de documento
+**Arquivo:** `src/components/ContractEditor.tsx` — linha ~607
 
-3. **Remover a mensagem condicional de Atas**
-   - Excluir o bloco `{documentType === 'atas' && (...)}` que exibe a mensagem sobre modelos de Atas
+Alterar o atributo `accept` do input de arquivo de:
+```
+accept="image/jpeg,image/png,application/pdf"
+```
+para:
+```
+accept="image/jpeg,image/png,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/webm"
+```
 
-### Resultado
-A interface mostrará apenas dois botões na seção "Tipo de Documento":
-- **Ocorrências** - para envio de ocorrências com modelos pré-definidos
-- **Diversos** - para envio de documentos diversos com texto livre e anexos
+Isso permitirá upload de arquivos JPG, PNG, PDF, MP4, MOV, AVI e WebM.
 
