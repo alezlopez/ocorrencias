@@ -1,23 +1,31 @@
 
 
-## Permitir upload de vídeo no template Recado + Mídia
+## Priorizar Mãe na seleção de Turma Completa
 
-### O que será feito
+### Regra
+Na seleção por turma completa, selecionar **apenas a Mãe**. Selecionar o Pai **somente** quando a Mãe não tiver telefone cadastrado.
 
-Adicionar formatos de vídeo (MP4, MOV, AVI) ao campo de upload de arquivos no template "Recado + Mídia" da aba Diversos.
+### Alterações
 
-### Alteração
+**Arquivo:** `src/components/StudentSearch.tsx` — linhas 168-177
 
-**Arquivo:** `src/components/ContractEditor.tsx` — linha ~607
+Substituir a lógica atual (que seleciona todos os pais válidos) por:
 
-Alterar o atributo `accept` do input de arquivo de:
+```typescript
+const mae = parents.find(p => p.type === 'Mãe');
+const pai = parents.find(p => p.type === 'Pai');
+
+// Priorizar mãe; usar pai somente se mãe não tiver telefone
+const selectedParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : mae || pai || null;
+
+return {
+  id: parseInt(item.codigo_aluno),
+  name: item.nome_aluno,
+  parents: parents,
+  selectedParent: selectedParent,
+  selectedParents: selectedParent ? [selectedParent] : []
+};
 ```
-accept="image/jpeg,image/png,application/pdf"
-```
-para:
-```
-accept="image/jpeg,image/png,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/webm"
-```
 
-Isso permitirá upload de arquivos JPG, PNG, PDF, MP4, MOV, AVI e WebM.
+Isso garante que cada aluno tenha apenas **um** responsável selecionado (mãe por padrão, pai como fallback), gerando uma única entrada no payload.
 
