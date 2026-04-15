@@ -256,6 +256,7 @@ export type Database = {
       }
       comunicados_2026: {
         Row: {
+          codigo_aluno: string | null
           created_at: string
           id: number
           link: string | null
@@ -263,6 +264,7 @@ export type Database = {
           nome_aluno: string | null
         }
         Insert: {
+          codigo_aluno?: string | null
           created_at?: string
           id?: number
           link?: string | null
@@ -270,6 +272,7 @@ export type Database = {
           nome_aluno?: string | null
         }
         Update: {
+          codigo_aluno?: string | null
           created_at?: string
           id?: number
           link?: string | null
@@ -325,6 +328,143 @@ export type Database = {
           id?: number
         }
         Relationships: []
+      }
+      eventos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          data_evento: string
+          descricao: string | null
+          horario: string | null
+          id: string
+          imagem_url: string | null
+          is_excursao: boolean
+          local: string | null
+          max_parcelas: number
+          preco: number
+          preco_parcelado: number
+          requer_autorizacao: boolean
+          tipo_evento: string
+          titulo: string
+          updated_at: string
+          vagas_disponiveis: number
+          vagas_total: number
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          data_evento: string
+          descricao?: string | null
+          horario?: string | null
+          id?: string
+          imagem_url?: string | null
+          is_excursao?: boolean
+          local?: string | null
+          max_parcelas?: number
+          preco?: number
+          preco_parcelado?: number
+          requer_autorizacao?: boolean
+          tipo_evento?: string
+          titulo: string
+          updated_at?: string
+          vagas_disponiveis?: number
+          vagas_total?: number
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          data_evento?: string
+          descricao?: string | null
+          horario?: string | null
+          id?: string
+          imagem_url?: string | null
+          is_excursao?: boolean
+          local?: string | null
+          max_parcelas?: number
+          preco?: number
+          preco_parcelado?: number
+          requer_autorizacao?: boolean
+          tipo_evento?: string
+          titulo?: string
+          updated_at?: string
+          vagas_disponiveis?: number
+          vagas_total?: number
+        }
+        Relationships: []
+      }
+      ingressos: {
+        Row: {
+          celular_participante: string | null
+          checkout_id: string | null
+          checkout_url: string | null
+          codigo_aluno: string | null
+          comprovante_estorno_url: string | null
+          cpf_participante: string | null
+          created_at: string
+          data_nascimento_participante: string | null
+          email_participante: string | null
+          evento_id: string
+          id: string
+          nome_comprador: string
+          nome_participante: string | null
+          quantidade: number
+          status: string
+          tipo_participante: string
+          user_id: string
+          utilizado: boolean
+          webhook_payment_id: string | null
+        }
+        Insert: {
+          celular_participante?: string | null
+          checkout_id?: string | null
+          checkout_url?: string | null
+          codigo_aluno?: string | null
+          comprovante_estorno_url?: string | null
+          cpf_participante?: string | null
+          created_at?: string
+          data_nascimento_participante?: string | null
+          email_participante?: string | null
+          evento_id: string
+          id?: string
+          nome_comprador: string
+          nome_participante?: string | null
+          quantidade?: number
+          status?: string
+          tipo_participante?: string
+          user_id: string
+          utilizado?: boolean
+          webhook_payment_id?: string | null
+        }
+        Update: {
+          celular_participante?: string | null
+          checkout_id?: string | null
+          checkout_url?: string | null
+          codigo_aluno?: string | null
+          comprovante_estorno_url?: string | null
+          cpf_participante?: string | null
+          created_at?: string
+          data_nascimento_participante?: string | null
+          email_participante?: string | null
+          evento_id?: string
+          id?: string
+          nome_comprador?: string
+          nome_participante?: string | null
+          quantidade?: number
+          status?: string
+          tipo_participante?: string
+          user_id?: string
+          utilizado?: boolean
+          webhook_payment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingressos_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "eventos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ocorrencias_mhund: {
         Row: {
@@ -473,6 +613,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_tokens: {
+        Row: {
+          atualizado_em: string | null
+          codigo_aluno: string
+          criado_em: string | null
+          id: number
+          nome_aluno: string
+          plataforma: string | null
+          push_token: string
+        }
+        Insert: {
+          atualizado_em?: string | null
+          codigo_aluno: string
+          criado_em?: string | null
+          id?: number
+          nome_aluno: string
+          plataforma?: string | null
+          push_token: string
+        }
+        Update: {
+          atualizado_em?: string | null
+          codigo_aluno?: string
+          criado_em?: string | null
+          id?: number
+          nome_aluno?: string
+          plataforma?: string | null
+          push_token?: string
+        }
+        Relationships: []
+      }
       rematricula: {
         Row: {
           Anuidade: string | null
@@ -614,6 +784,27 @@ export type Database = {
         }
         Relationships: []
       }
+      responsaveis_senhas: {
+        Row: {
+          cpf: string
+          created_at: string
+          id: string
+          senha_hash: string
+        }
+        Insert: {
+          cpf: string
+          created_at?: string
+          id?: string
+          senha_hash: string
+        }
+        Update: {
+          cpf?: string
+          created_at?: string
+          id?: string
+          senha_hash?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string
@@ -632,6 +823,27 @@ export type Database = {
           id?: string
           user_id?: string
           username?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -690,6 +902,29 @@ export type Database = {
           vagas_disponiveis: number
         }[]
       }
+      find_alunos_by_cpf: {
+        Args: { p_cpf: string }
+        Returns: {
+          codigo_aluno: string
+          curso: string
+          nome_aluno: string
+        }[]
+      }
+      find_alunos_by_email: {
+        Args: { p_email: string }
+        Returns: {
+          codigo_aluno: string
+          curso: string
+          nome_aluno: string
+        }[]
+      }
+      find_email_by_cpf: {
+        Args: { p_cpf: string }
+        Returns: {
+          email: string
+          nome: string
+        }[]
+      }
       get_vagas_disponiveis: {
         Args: never
         Returns: {
@@ -700,6 +935,13 @@ export type Database = {
           turno: string
           vagas_disponiveis: number
         }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
@@ -838,7 +1080,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -965,6 +1207,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
