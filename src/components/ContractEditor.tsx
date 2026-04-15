@@ -430,7 +430,19 @@ export const ContractEditor = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 text-center animate-fade-in">
+        <div className="mb-8 text-center animate-fade-in relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 right-0"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.href = '/login';
+            }}
+          >
+            <LogOut className="mr-1 h-4 w-4" />
+            Sair
+          </Button>
           <div className="flex items-center justify-center gap-4 mb-6">
             <img 
               src="/lovable-uploads/f23dd2df-3cc1-4994-b227-eb27c08bb994.png" 
