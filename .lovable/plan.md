@@ -1,31 +1,31 @@
 
 
-## Priorizar Mãe na seleção de Turma Completa
+## Login Administrativo
 
-### Regra
-Na seleção por turma completa, selecionar **apenas a Mãe**. Selecionar o Pai **somente** quando a Mãe não tiver telefone cadastrado.
+### O que será feito
+Criar uma tela de login para proteger o acesso ao sistema. Apenas usuários cadastrados via Supabase Dashboard poderão acessar. Não haverá tela de cadastro.
 
 ### Alterações
 
-**Arquivo:** `src/components/StudentSearch.tsx` — linhas 168-177
+1. **Criar página de Login** (`src/pages/Login.tsx`)
+   - Formulário com email e senha
+   - Usa `supabase.auth.signInWithPassword()`
+   - Redireciona para `/` após login bem-sucedido
 
-Substituir a lógica atual (que seleciona todos os pais válidos) por:
+2. **Criar componente de proteção de rota** (`src/components/ProtectedRoute.tsx`)
+   - Verifica sessão ativa com `supabase.auth.onAuthStateChange`
+   - Redireciona para `/login` se não autenticado
+   - Mostra loading enquanto verifica
 
-```typescript
-const mae = parents.find(p => p.type === 'Mãe');
-const pai = parents.find(p => p.type === 'Pai');
+3. **Atualizar `src/App.tsx`**
+   - Adicionar rota `/login`
+   - Envolver a rota `/` com `ProtectedRoute`
 
-// Priorizar mãe; usar pai somente se mãe não tiver telefone
-const selectedParent = (mae && mae.phone) ? mae : (pai && pai.phone) ? pai : mae || pai || null;
+4. **Adicionar botão de logout** no `ContractEditor.tsx`
+   - Botão discreto no header para `supabase.auth.signOut()`
 
-return {
-  id: parseInt(item.codigo_aluno),
-  name: item.nome_aluno,
-  parents: parents,
-  selectedParent: selectedParent,
-  selectedParents: selectedParent ? [selectedParent] : []
-};
-```
-
-Isso garante que cada aluno tenha apenas **um** responsável selecionado (mãe por padrão, pai como fallback), gerando uma única entrada no payload.
+### Detalhes técnicos
+- Usa Supabase Auth nativo (email/password)
+- Cadastro de usuários feito manualmente no Supabase Dashboard (Auth > Users)
+- Sessão persistida via localStorage (já configurado no client)
 
