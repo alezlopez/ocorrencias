@@ -300,10 +300,14 @@ export const ContractEditor = () => {
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">Mensagens no período</span>
               </div>
-              <span className={`text-sm font-bold ${messageUsage ? getUsageColor() : 'text-muted-foreground'}`}>
-                {messageUsage
-                  ? `${messageUsage.messages_sent.toLocaleString()} / ${messageUsage.max_messages.toLocaleString()}`
-                  : 'Carregando...'}
+              <span className={`text-sm font-bold ${usageError ? 'text-destructive' : messageUsage ? getUsageColor() : 'text-muted-foreground'}`}>
+                {isUsageLoading
+                  ? 'Carregando...'
+                  : usageError
+                    ? usageError
+                    : messageUsage
+                      ? `${messageUsage.messages_sent.toLocaleString()} / ${messageUsage.max_messages.toLocaleString()}`
+                      : '—'}
               </span>
             </div>
             <Progress value={messageUsage ? usagePercent : 0} className={`h-2 ${getProgressClass()}`} />
