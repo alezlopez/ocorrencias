@@ -213,6 +213,7 @@ export const ContractEditor = () => {
         return parents.map(parent => ({
           texto: processedText,
           nomeAluno: student.name,
+          codigoAluno: student.id,
           nomeResponsavel: parent.name || '',
           cpfResponsavel: parent.cpf || '',
           whatsapp: parent.phone || '',
