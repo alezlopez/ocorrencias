@@ -147,36 +147,19 @@ export const RichTextEditor = ({ value, onChange, onPreview }: RichTextEditorPro
         <Textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Digite apenas o conteúdo da mensagem. A saudação e despedida já fazem parte do template do WhatsApp."
-          className="min-h-[400px] font-sans text-base leading-relaxed"
+          onChange={(e) => {
+            if (e.target.value.length <= 250) {
+              onChange(e.target.value);
+            }
+          }}
+          placeholder="Digite o conteúdo da mensagem..."
+          className="min-h-[200px] font-sans text-base leading-relaxed"
+          maxLength={250}
           dir="ltr"
           style={{ direction: "ltr", textAlign: "left" }}
         />
-
-        {/* Help Text */}
-        <div className="text-xs text-muted-foreground bg-accent/50 p-3 rounded">
-          <p className="font-medium mb-2">Como usar:</p>
-          <ul className="space-y-1 list-disc list-inside">
-            <li>
-              <strong>Formatação:</strong> Selecione o texto e clique em Negrito, Itálico ou Sublinhado
-            </li>
-            <li>
-              <strong>Variáveis:</strong> Clique no botão "Variáveis" para inserir dados dinâmicos
-            </li>
-          </ul>
-          <p className="font-medium mt-3 mb-1">Variáveis disponíveis:</p>
-          <div className="grid grid-cols-2 gap-1">
-            <p>
-              <code className="bg-background px-1 rounded">{"{{NOME_ALUNO}}"}</code> - Nome do aluno
-            </p>
-            <p>
-              <code className="bg-background px-1 rounded">{"{{NOME_PAI}}"}</code> - Nome do pai
-            </p>
-            <p>
-              <code className="bg-background px-1 rounded">{"{{NOME_MAE}}"}</code> - Nome da mãe
-            </p>
-          </div>
+        <div className="text-xs text-muted-foreground text-right">
+          {value.length}/250 caracteres
         </div>
       </CardContent>
     </Card>
