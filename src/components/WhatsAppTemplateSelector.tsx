@@ -75,7 +75,7 @@ export const WhatsAppTemplateSelector = ({
 
               <div>
                 <h4 className="font-semibold text-foreground text-sm">{template.name}</h4>
-                <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                
               </div>
 
               <Badge variant="outline" className={cn('text-xs', config.badgeClass)}>

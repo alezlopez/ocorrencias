@@ -572,23 +572,10 @@ export const ContractEditor = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <div>
-                        <RichTextEditor
-                          value={diversosText}
-                          onChange={setDiversosText}
-                        />
-                      </div>
-                      <div>
-                        <WhatsAppPreview
-                          text={replaceVariables(diversosText, selectedStudents[0])}
-                          studentName={selectedStudents[0]?.name}
-                          template={selectedWhatsAppTemplate}
-                          link={diversosLink}
-                          mediaFileName={diversosFiles.length > 0 ? diversosFiles[0].name : undefined}
-                        />
-                      </div>
-                    </div>
+                    <RichTextEditor
+                      value={diversosText}
+                      onChange={setDiversosText}
+                    />
 
                     {/* Campo de Link (apenas para templates de link) */}
                     {selectedWhatsAppTemplate.acceptsLink && (
@@ -658,40 +645,6 @@ export const ContractEditor = () => {
             </>
           )}
 
-          {/* Preview do Documento */}
-          {selectedTemplate && selectedStudents.length > 0 && selectedStudents.every(s => s.selectedParent) && (
-            <Card className="shadow-card animate-slide-up">
-              <CardHeader className="bg-gradient-card rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  4. Preview do Documento
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="p-4 bg-accent/30 rounded-lg border">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Documento será gerado automaticamente com as seguintes informações:
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <strong>Modelo:</strong> {CONTRACT_TEMPLATES.find(t => t.id === selectedTemplate)?.name}
-                    </div>
-                    <div>
-                      <strong>Aluno(s):</strong> {selectedStudents.length} selecionado(s)
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setIsPreviewOpen(true)}
-                    className="mt-3"
-                  >
-                    Visualizar Preview
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
 
           {/* Ações */}
