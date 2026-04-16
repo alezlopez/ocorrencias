@@ -42,6 +42,8 @@ export const ContractEditor = () => {
   const [selectedWhatsAppTemplate, setSelectedWhatsAppTemplate] = useState<WhatsAppTemplate | null>(null);
   const [diversosLink, setDiversosLink] = useState('');
   const [messageUsage, setMessageUsage] = useState<MessageUsage | null>(null);
+  const [isUsageLoading, setIsUsageLoading] = useState(true);
+  const [usageError, setUsageError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
