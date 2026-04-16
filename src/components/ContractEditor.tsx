@@ -284,26 +284,29 @@ export const ContractEditor = () => {
             </div>
           </div>
 
-          {/* Barra de uso */}
-          {messageUsage && (
-            <div className="bg-card border rounded-lg p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
+          {/* Barra de uso — sempre visível */}
+          <div className="bg-card border rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">Mensagens no período</span>
-                <span className={`text-sm font-bold ${getUsageColor()}`}>
-                  {messageUsage.messages_sent.toLocaleString()} / {messageUsage.max_messages.toLocaleString()}
+              </div>
+              <span className={`text-sm font-bold ${messageUsage ? getUsageColor() : 'text-muted-foreground'}`}>
+                {messageUsage
+                  ? `${messageUsage.messages_sent.toLocaleString()} / ${messageUsage.max_messages.toLocaleString()}`
+                  : 'Carregando...'}
+              </span>
+            </div>
+            <Progress value={messageUsage ? usagePercent : 0} className={`h-2 ${getProgressClass()}`} />
+            {isLimitReached && (
+              <div className="flex items-center gap-2 mt-3 p-3 bg-destructive/10 rounded-md">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                <span className="text-sm text-destructive font-medium">
+                  Limite atingido. O envio está bloqueado até o próximo período (dia 15).
                 </span>
               </div>
-              <Progress value={usagePercent} className={`h-2 ${getProgressClass()}`} />
-              {isLimitReached && (
-                <div className="flex items-center gap-2 mt-3 p-3 bg-destructive/10 rounded-md">
-                  <AlertTriangle className="h-4 w-4 text-destructive" />
-                  <span className="text-sm text-destructive font-medium">
-                    Limite atingido. O envio está bloqueado até o próximo período (dia 15).
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">
