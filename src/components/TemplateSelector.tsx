@@ -32,9 +32,6 @@ export const TemplateSelector = ({ selectedTemplate, onTemplateSelect }: Templat
               <CardTitle className="text-base">{template.name}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-sm text-muted-foreground mb-3">
-                {template.description}
-              </p>
               <Button 
                 variant={selectedTemplate === template.id ? "default" : "outline"}
                 size="sm" 
@@ -47,16 +44,6 @@ export const TemplateSelector = ({ selectedTemplate, onTemplateSelect }: Templat
         ))}
       </div>
       
-      {selectedTemplate && (
-        <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-          <p className="text-sm text-primary font-medium">
-            ✓ Modelo selecionado: {CONTRACT_TEMPLATES.find(t => t.id === selectedTemplate)?.name}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            As variáveis serão preenchidas automaticamente com os dados do aluno selecionado.
-          </p>
-        </div>
-      )}
     </div>
   );
 };
