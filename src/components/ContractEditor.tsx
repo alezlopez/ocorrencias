@@ -42,6 +42,8 @@ export const ContractEditor = () => {
   const [selectedWhatsAppTemplate, setSelectedWhatsAppTemplate] = useState<WhatsAppTemplate | null>(null);
   const [diversosLink, setDiversosLink] = useState('');
   const [messageUsage, setMessageUsage] = useState<MessageUsage | null>(null);
+  const [isUsageLoading, setIsUsageLoading] = useState(true);
+  const [usageError, setUsageError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
@@ -49,14 +51,21 @@ export const ContractEditor = () => {
   }, []);
 
   const fetchMessageUsage = async () => {
+    setIsUsageLoading(true);
+    setUsageError(null);
     try {
       const { data, error } = await supabase.rpc('get_current_message_period');
       if (error) throw error;
       if (data && data.length > 0) {
         setMessageUsage(data[0] as MessageUsage);
+      } else {
+        setUsageError('Nenhum período encontrado.');
       }
     } catch (err) {
       console.error('Erro ao buscar uso de mensagens:', err);
+      setUsageError('Erro ao carregar contador.');
+    } finally {
+      setIsUsageLoading(false);
     }
   };
 
@@ -291,10 +300,14 @@ export const ContractEditor = () => {
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">Mensagens no período</span>
               </div>
-              <span className={`text-sm font-bold ${messageUsage ? getUsageColor() : 'text-muted-foreground'}`}>
-                {messageUsage
-                  ? `${messageUsage.messages_sent.toLocaleString()} / ${messageUsage.max_messages.toLocaleString()}`
-                  : 'Carregando...'}
+              <span className={`text-sm font-bold ${usageError ? 'text-destructive' : messageUsage ? getUsageColor() : 'text-muted-foreground'}`}>
+                {isUsageLoading
+                  ? 'Carregando...'
+                  : usageError
+                    ? usageError
+                    : messageUsage
+                      ? `${messageUsage.messages_sent.toLocaleString()} / ${messageUsage.max_messages.toLocaleString()}`
+                      : '—'}
               </span>
             </div>
             <Progress value={messageUsage ? usagePercent : 0} className={`h-2 ${getProgressClass()}`} />
