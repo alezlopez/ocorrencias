@@ -637,7 +637,7 @@ export const ContractEditor = () => {
                       onClick={handleSendDiversos}
                     >
                       <Send className="h-4 w-4" />
-                      Enviar via WhatsApp
+                      Enviar via SMS
                     </Button>
                   </CardContent>
                 </Card>
@@ -659,7 +659,7 @@ export const ContractEditor = () => {
                       onClick={handleSendForSignature}
                     >
                       <Send className="h-4 w-4" />
-                      Enviar para Assinatura
+                      Enviar via SMS
                     </Button>
                   </div>
                   
