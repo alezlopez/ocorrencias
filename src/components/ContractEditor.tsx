@@ -51,14 +51,21 @@ export const ContractEditor = () => {
   }, []);
 
   const fetchMessageUsage = async () => {
+    setIsUsageLoading(true);
+    setUsageError(null);
     try {
       const { data, error } = await supabase.rpc('get_current_message_period');
       if (error) throw error;
       if (data && data.length > 0) {
         setMessageUsage(data[0] as MessageUsage);
+      } else {
+        setUsageError('Nenhum período encontrado.');
       }
     } catch (err) {
       console.error('Erro ao buscar uso de mensagens:', err);
+      setUsageError('Erro ao carregar contador.');
+    } finally {
+      setIsUsageLoading(false);
     }
   };
 
