@@ -1,110 +1,103 @@
 
+Resumo
 
-## Reformulação UX — Sistema de Mensagens
+Vou corrigir isso em duas frentes: banco e interface. A causa raiz já está identificada no Supabase: o RPC `get_current_message_period()` está quebrando no banco antes mesmo de retornar dados, então o frontend fica preso em “Carregando...”.
 
-### Resumo
-Remover a aba "Ocorrências", simplificar o fluxo para apenas mensagens (Diversos), adicionar sistema de contagem de mensagens com limite de 4.000 por período (reset dia 15), e melhorar a UX geral.
+Causa raiz confirmada
 
-### 1. Criar tabela de contagem de mensagens
+Ao validar diretamente no Supabase, a função falha com este erro:
 
-Nova migration para criar tabela `message_usage`:
-
-```sql
-CREATE TABLE public.message_usage (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  period_start date NOT NULL,
-  period_end date NOT NULL,
-  messages_sent integer NOT NULL DEFAULT 0,
-  max_messages integer NOT NULL DEFAULT 4000,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(period_start)
-);
-
-ALTER TABLE public.message_usage ENABLE ROW LEVEL SECURITY;
-
--- RLS: admins podem ler e atualizar
-CREATE POLICY "Admins can manage message_usage"
-  ON public.message_usage FOR ALL TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'))
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+```text
+ERROR: column reference "period_start" is ambiguous
+CONTEXT: PL/pgSQL function get_current_message_period() line 14 at SQL statement
 ```
 
-Criar função para obter/incrementar contagem do período atual:
+Isso acontece porque a função usa `RETURNS TABLE(period_start, period_end, ...)`, e esses nomes viram variáveis internas do PL/pgSQL. Dentro do `INSERT ... ON CONFLICT (period_start)`, o Postgres passa a enxergar `period_start` como ambíguo entre:
+- a coluna da tabela `message_usage`
+- a variável de saída da própria função
 
-```sql
-CREATE OR REPLACE FUNCTION public.get_current_message_period()
-RETURNS TABLE(period_start date, period_end date, messages_sent integer, max_messages integer)
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-DECLARE
-  p_start date;
-  p_end date;
-BEGIN
-  -- Período: dia 15 do mês atual até dia 14 do próximo mês
-  IF EXTRACT(DAY FROM CURRENT_DATE) >= 15 THEN
-    p_start := date_trunc('month', CURRENT_DATE) + interval '14 days';
-    p_end := (date_trunc('month', CURRENT_DATE) + interval '1 month' + interval '14 days')::date;
-  ELSE
-    p_start := (date_trunc('month', CURRENT_DATE) - interval '1 month' + interval '14 days')::date;
-    p_end := (date_trunc('month', CURRENT_DATE) + interval '14 days')::date;
-  END IF;
+Ou seja: o problema principal não é a policy RLS em si, e sim a função SQL quebrada.
 
-  -- Criar registro se não existir
-  INSERT INTO message_usage (period_start, period_end)
-  VALUES (p_start, p_end)
-  ON CONFLICT (period_start) DO NOTHING;
+O que vou implementar
 
-  RETURN QUERY SELECT mu.period_start, mu.period_end, mu.messages_sent, mu.max_messages
-  FROM message_usage mu WHERE mu.period_start = p_start;
-END;
-$$;
+1. Corrigir definitivamente as funções do contador no banco
+- Reescrever `get_current_message_period()`
+- Reescrever `increment_message_count(count integer)`
+- Usar nomes internos sem colisão, por exemplo:
+  - `v_period_start`
+  - `v_period_end`
+- Trocar `ON CONFLICT (period_start)` por `ON CONFLICT ON CONSTRAINT ...` para eliminar ambiguidade
+- Garantir que `increment_message_count()` crie/garanta o período antes de atualizar, evitando update sem linha
 
-CREATE OR REPLACE FUNCTION public.increment_message_count(count integer)
-RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-DECLARE p_start date;
-BEGIN
-  IF EXTRACT(DAY FROM CURRENT_DATE) >= 15 THEN
-    p_start := date_trunc('month', CURRENT_DATE) + interval '14 days';
-  ELSE
-    p_start := (date_trunc('month', CURRENT_DATE) - interval '1 month' + interval '14 days')::date;
-  END IF;
-  UPDATE message_usage SET messages_sent = messages_sent + count WHERE period_start = p_start;
-END;
-$$;
+2. Revisar e ajustar a segurança/RLS do contador
+- Manter a tabela `message_usage` protegida por RLS
+- Confirmar que o acesso direto à tabela continue restrito
+- Como as funções são `SECURITY DEFINER`, elas podem consultar/atualizar a tabela sem depender da policy do usuário final
+- Restringir `EXECUTE` das funções para `authenticated` em vez de deixar exposto a `PUBLIC`, para ficar consistente com o sistema administrativo
+
+3. Corrigir o comportamento do frontend
+No `ContractEditor.tsx`:
+- separar estados:
+  - `messageUsage`
+  - `isUsageLoading`
+  - `usageError`
+- parar de deixar `null` significar “carregando para sempre”
+- mostrar 3 estados visuais corretos:
+  - carregando
+  - carregado com números
+  - erro ao carregar
+- se o RPC falhar, exibir mensagem clara no cabeçalho em vez de “Carregando...” eterno
+
+4. Melhorar a robustez do envio
+- Após envio bem-sucedido, continuar incrementando o contador
+- Se a atualização do contador falhar, mostrar erro explícito
+- Recarregar o contador após envio com tratamento de erro real
+
+Arquivos que serão alterados
+
+- `supabase/migrations/...sql`
+  - correção das funções
+  - ajuste de permissões `EXECUTE`
+- `src/components/ContractEditor.tsx`
+  - tratamento real de loading/erro do contador
+  - cabeçalho sempre visível sem loop infinito de loading
+
+Resultado esperado
+
+- O contador aparece no cabeçalho de forma confiável
+- O período atual é criado automaticamente no banco
+- O contador deixa de ficar eternamente carregando
+- O bloqueio de limite volta a funcionar com base em dados reais
+- A tabela continua protegida por RLS, mas as funções passam a operar corretamente
+
+Detalhes técnicos
+
+Banco:
+```text
+message_usage
+  RLS: mantida
+  acesso direto: restrito
+  leitura/escrita do contador: via SECURITY DEFINER
 ```
 
-### 2. Remover Ocorrências do `ContractEditor.tsx`
+Fluxo final:
+```text
+Tela abre
+  -> frontend chama get_current_message_period()
+  -> função garante linha do período atual
+  -> retorna messages_sent + max_messages
+  -> cabeçalho mostra contador
 
-- Remover o botão "Ocorrências" e toda a lógica associada (seleção de template de contrato, envio para ZapSign, preview de contrato)
-- Remover imports não utilizados: `TemplateSelector`, `ContractPreview`, `ContractTemplates`, `html2pdf`
-- Remover states: `selectedTemplate`, `contractData`, `isPreviewOpen`, `documentType`
-- O fluxo passa direto: seleção de aluno → template WhatsApp → preencher mensagem → enviar
+Ao enviar mensagem
+  -> send-whatsapp
+  -> increment_message_count(total)
+  -> refetch do contador
+```
 
-### 3. Redesign da UX no `ContractEditor.tsx`
+Validação que vou fazer depois da implementação
 
-- **Header**: Atualizar título para "Envio de Mensagens" com subtítulo limpo
-- **Barra de uso**: Adicionar componente visual (progress bar) mostrando "X de 4.000 mensagens usadas" com cor que muda (verde → amarelo → vermelho)
-- **Fluxo simplificado em 3 passos** (sem seleção de tipo de documento):
-  1. Selecionar Aluno(s)
-  2. Escolher Template
-  3. Preencher e Enviar
-- **Bloquear envio** quando limite atingido, mostrando alerta
-- **Incrementar contador** após envio bem-sucedido (quantidade = número de alunos no payload)
-
-### 4. Arquivos alterados
-
-| Arquivo | Ação |
-|---------|------|
-| `src/components/ContractEditor.tsx` | Refatorar: remover ocorrências, simplificar fluxo, adicionar barra de uso |
-| `src/components/TemplateSelector.tsx` | Pode ser removido (não mais utilizado) |
-| `src/components/ContractTemplates.ts` | Pode ser removido |
-| `src/components/ContractPreview.tsx` | Pode ser removido |
-| `src/components/TimbradoA4.tsx` | Pode ser removido |
-| Migration | Criar tabela `message_usage` + funções SQL |
-
-### 5. Resultado esperado
-
-- Interface mais limpa com apenas 3 passos
-- Barra de progresso de mensagens visível no topo
-- Bloqueio automático ao atingir 4.000 mensagens por período
-- Reset automático a cada dia 15
-
+- abrir a tela e confirmar que o cabeçalho mostra os números
+- validar que o RPC retorna uma linha do período atual
+- enviar uma mensagem e confirmar incremento
+- simular erro do RPC e verificar fallback visual sem loading infinito
+- conferir que usuário não autenticado não consegue executar o RPC
