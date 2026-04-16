@@ -1,31 +1,15 @@
 
 
-## Login Administrativo
-
-### O que será feito
-Criar uma tela de login para proteger o acesso ao sistema. Apenas usuários cadastrados via Supabase Dashboard poderão acessar. Não haverá tela de cadastro.
+## Remover preview e textos de ajuda dos templates
 
 ### Alterações
 
-1. **Criar página de Login** (`src/pages/Login.tsx`)
-   - Formulário com email e senha
-   - Usa `supabase.auth.signInWithPassword()`
-   - Redireciona para `/` após login bem-sucedido
+1. **`src/components/WhatsAppTemplateSelector.tsx`** — Remover a descrição de cada template (linha 78)
 
-2. **Criar componente de proteção de rota** (`src/components/ProtectedRoute.tsx`)
-   - Verifica sessão ativa com `supabase.auth.onAuthStateChange`
-   - Redireciona para `/login` se não autenticado
-   - Mostra loading enquanto verifica
+2. **`src/components/TemplateSelector.tsx`** — Remover a descrição de cada template (linhas 35-37) e o bloco de ajuda inferior "Modelo selecionado / variáveis preenchidas automaticamente" (linhas 50-58)
 
-3. **Atualizar `src/App.tsx`**
-   - Adicionar rota `/login`
-   - Envolver a rota `/` com `ProtectedRoute`
+3. **`src/components/ContractEditor.tsx`** — Remover o WhatsAppPreview do formulário Diversos (linhas 582-590), ajustando o grid para coluna única. Também remover o bloco "Preview do Documento" das Ocorrências (linhas 661-694)
 
-4. **Adicionar botão de logout** no `ContractEditor.tsx`
-   - Botão discreto no header para `supabase.auth.signOut()`
-
-### Detalhes técnicos
-- Usa Supabase Auth nativo (email/password)
-- Cadastro de usuários feito manualmente no Supabase Dashboard (Auth > Users)
-- Sessão persistida via localStorage (já configurado no client)
+### Resultado
+Os seletores de template ficam mais limpos, mostrando apenas nome, ícone e badge. O preview do WhatsApp e o preview do documento de ocorrências são removidos.
 
